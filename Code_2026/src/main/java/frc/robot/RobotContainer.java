@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ChaseAprilTagCommand;
+import frc.robot.commands.DriveDistance;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
@@ -76,6 +77,8 @@ public class RobotContainer {
     );
 
     driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, limelight, 18, 1, 0));
+
+    driverXbox.x().onTrue(new DriveDistance(drivebase, 0, 1, 1));
   }
 
   /**
