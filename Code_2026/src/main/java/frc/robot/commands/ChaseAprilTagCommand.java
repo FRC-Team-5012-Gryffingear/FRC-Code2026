@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -40,9 +41,9 @@ public class ChaseAprilTagCommand extends Command {
     private static final double KD_ANGULAR = 0.23;
     
     // Tolerances
-    private static final double TOLERANCE_LINEAR = 0.15;  // 5cm
-    private static final double TOLERANCE_ANGULAR = edu.wpi.first.math.util.Units.degreesToRadians(4);  // 2°
-    private static final double TIMEOUT_SECONDS = 5.0;
+    private static final double TOLERANCE_LINEAR = 0.05;  // 5cm
+    private static final double TOLERANCE_ANGULAR = edu.wpi.first.math.util.Units.degreesToRadians(2.5);  // 2°
+    private static final double TIMEOUT_SECONDS = 7.0;
     
     private double startTime;
 
@@ -69,7 +70,7 @@ public class ChaseAprilTagCommand extends Command {
         
         // Set tolerances (when to consider at goal)
         xController.setTolerance(TOLERANCE_LINEAR);
-        yController.setTolerance(TOLERANCE_LINEAR);
+        yController.setTolerance(0.01);
         rotController.setTolerance(TOLERANCE_ANGULAR);
         
         // Rotation wraps around (can go -180° to +180°)
@@ -88,9 +89,9 @@ public class ChaseAprilTagCommand extends Command {
   @Override
   public void execute() {
      var visionData = limelight.getRawVisionMeasurement();
-        if (visionData == null || visionData.tagCount < 1) {
+        if ((visionData == null || visionData.tagCount < 1) && LimelightHelpers.getFiducialID("limelight-daniel") == targetTagID) {
             // No tag visible - stop moving
-            System.out.println("❌ No tags visible");
+            System.out.println("No tags visible");
             swerve.getSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
             return;
         }
@@ -121,6 +122,17 @@ public class ChaseAprilTagCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    double elapsed = Timer.getFPGATimestamp() - startTime;
+        
+        boolean atGoal = xController.atSetpoint() && 
+                        yController.atSetpoint() && 
+                        rotController.atSetpoint();
+        
+        boolean timedOut = elapsed > TIMEOUT_SECONDS;
+        
+        if (atGoal) System.out.println("✅ Reached goal!");
+        if (timedOut) System.out.println("⏱️ Timeout!");
+        
+        return atGoal || timedOut;
   }
 }

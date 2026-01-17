@@ -19,7 +19,7 @@ public class LimelightSubsystem extends SubsystemBase {
     return LimelightHelpers.getCameraPose3d_TargetSpace(LL_NAME).getX();
   }
   public double getZ(){
-    return LimelightHelpers.getCameraPose3d_TargetSpace(LL_NAME).getX();
+    return LimelightHelpers.getCameraPose3d_TargetSpace(LL_NAME).getZ();
   }
 
   public double getDistance(){

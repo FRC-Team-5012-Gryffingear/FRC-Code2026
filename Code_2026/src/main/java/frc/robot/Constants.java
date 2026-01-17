@@ -16,6 +16,10 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static final double MAX_SPEED = Units.feetToMeters(4.5);
+  public static final double elevOffset = -0.928955078125;
+  public static final int elev_Encoder = 14;
+  public static final int elev_Motor = 15;
+  public static final int elev_climb = 18;
   public static class OperatorConstants {
     public static final double DEADBAND = 0.15;
     public static final int OperatorContrlPort = 1;
