@@ -5,19 +5,10 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ChaseAprilTagCommand;
 import frc.robot.commands.DriveDistance;
-import frc.robot.commands.ElevatorCom;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.ScoringCommand;
-import frc.robot.commands.intakeState1;
-import frc.robot.commands.intakeState2;
-import frc.robot.subsystems.ElevatorSubsys;
+
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.intakePneumatics;
 import swervelib.SwerveInputStream;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -38,9 +29,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem();
-  private final LimelightSubsystem limelight = new LimelightSubsystem();
-  private final intakePneumatics intake = new intakePneumatics();
-  private final ElevatorSubsys elev = new ElevatorSubsys(intake);
   // The robot's subsystems and commands are defined here...
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -61,7 +49,6 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-     elev.setDefaultCommand(new ElevatorCom(elev,operatorController, 0));
   }
 
   /**
@@ -86,32 +73,20 @@ public class RobotContainer {
       })
     );
 
-    driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, limelight, 18, 0.864, 0));
-
     driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
-     operatorController.leftBumper().onTrue(new intakeState1(intake));
-    operatorController.rightBumper().onTrue(new intakeState2(intake));
-    operatorController.y().whileTrue(new ElevatorCom(elev, operatorController, 15)); //1st level 0.75
-    operatorController.a().whileTrue(new ElevatorCom(elev,operatorController, 15)); // 2st level 2.41
-    operatorController.b().whileTrue(new ElevatorCom(elev,operatorController, 15)); // 3nd level 5.2 
-    operatorController.x().whileTrue(new ElevatorCom(elev, operatorController, 15)); // 4rd level  9.65
-    operatorController.leftStick().whileTrue(new ElevatorCom(elev, operatorController, 15)); // Human player station  1.2
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
+      * @return 
+      *
+      * @return the command to run in autonomous
+      */
+     public void Command () {
     // An example command will be run in autonomous
     //  return Commands.runOnce(() -> {
     //     intake.toggle();
     //   });
     // return new intakeState2(intake);
-    return new SequentialCommandGroup(
-        new ChaseAprilTagCommand(drivebase, limelight, 18, 0.864, -0.141),  
-        new DriveDistance(drivebase, 0.74, 0, 1.0), 
-        new ScoringCommand(elev, intake, 9.95));
   }
 }
