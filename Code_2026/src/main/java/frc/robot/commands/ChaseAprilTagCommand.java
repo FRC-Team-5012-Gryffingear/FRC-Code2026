@@ -41,7 +41,8 @@ public class ChaseAprilTagCommand extends Command {
     private static final double KD_ANGULAR = 0.23;
     
     // Tolerances
-    private static final double TOLERANCE_LINEAR = 0.05;  // 5cm
+    private static final double TOLERANCE_FORWARD = 0.05;  // 5cm
+    private static final double TOLERANCE_HORIZONTAL = 0.01;
     private static final double TOLERANCE_ANGULAR = edu.wpi.first.math.util.Units.degreesToRadians(2.5);  // 2°
     private static final double TIMEOUT_SECONDS = 7.0;
     
@@ -69,8 +70,8 @@ public class ChaseAprilTagCommand extends Command {
         rotController = new ProfiledPIDController(KP_ANGULAR, 0, KD_ANGULAR, angularConstraints);
         
         // Set tolerances (when to consider at goal)
-        xController.setTolerance(TOLERANCE_LINEAR);
-        yController.setTolerance(0.01);
+        xController.setTolerance(TOLERANCE_FORWARD);
+        yController.setTolerance(TOLERANCE_HORIZONTAL);
         rotController.setTolerance(TOLERANCE_ANGULAR);
         
         // Rotation wraps around (can go -180° to +180°)

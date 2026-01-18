@@ -24,8 +24,10 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -89,7 +91,17 @@ public class RobotContainer {
     driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, limelight, 18, 0.864, 0));
 
     driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
-     operatorController.leftBumper().onTrue(new intakeState1(intake));
+
+    driverXbox.y().whileTrue(new RunCommand(
+      ()-> drivebase.getSwerveDrive().drive(
+        new ChassisSpeeds(LimelightHelpers.getTY("limelight-daniel")* -0.1,
+        -driverXbox.getLeftX() * 2.0,
+        LimelightHelpers.getTX("limelight-daniel") *-0.05)
+      ),drivebase
+    ));
+
+
+    operatorController.leftBumper().onTrue(new intakeState1(intake));
     operatorController.rightBumper().onTrue(new intakeState2(intake));
     operatorController.y().whileTrue(new ElevatorCom(elev, operatorController, 15)); //1st level 0.75
     operatorController.a().whileTrue(new ElevatorCom(elev,operatorController, 15)); // 2st level 2.41
@@ -111,7 +123,7 @@ public class RobotContainer {
     // return new intakeState2(intake);
     return new SequentialCommandGroup(
         new ChaseAprilTagCommand(drivebase, limelight, 18, 0.864, -0.141),  
-        new DriveDistance(drivebase, 0.74, 0, 1.0), 
-        new ScoringCommand(elev, intake, 9.95));
+        new DriveDistance(drivebase, 0.73, 0, 1.0), 
+        new ScoringCommand(elev, intake, 9.43));
   }
 }

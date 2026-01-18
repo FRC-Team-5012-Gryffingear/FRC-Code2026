@@ -59,30 +59,30 @@ public class ElevatorCom extends Command {
     elev.elevMovement(heightMoved);
     System.out.println("RUNNING RUNNING RUNNING ELEV CODE");
     
-    // if(controller2.a().getAsBoolean()){
-    //   elev.elevMovement(0);
-    // }
-    // else if(controller2.b().getAsBoolean()){
-    //   elev.elevMovement(2.34);
-    // }
-    // else if(controller2.x().getAsBoolean()){
-    //   elev.elevMovement(5.36);
-    // }
-    // else if(controller2.y().getAsBoolean()){
-    //   elev.elevMovement(9.65); 
-    // }
-    // else if(controller2.leftStick().getAsBoolean()){
-    //   elev.elevMovement(1.23); 
-    // }
-    // else if(controller2.rightStick().getAsBoolean()){
-    //   elev.resetEncoderPos();
-    // }
-    // else{
-    //   if(!DriverStation.isAutonomous()){
-    //     elev.elevUpAndDown(controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis());
-    //   } 
-    // }
-    // elev.elevUpAndDown(controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis());
+    if(controller2.a().getAsBoolean()){
+      elev.elevMovement(0);
+    }
+    else if(controller2.b().getAsBoolean()){
+      elev.elevMovement(2.34);
+    }
+    else if(controller2.x().getAsBoolean()){
+      elev.elevMovement(5.36);
+    }
+    else if(controller2.y().getAsBoolean()){
+      elev.elevMovement(9.65); 
+    }
+    else if(controller2.leftStick().getAsBoolean()){
+      elev.elevMovement(1.23); 
+    }
+    else if(controller2.rightStick().getAsBoolean()){
+      elev.resetEncoderPos();
+    }
+    else{
+      if(!DriverStation.isAutonomous()){
+        elev.elevUpAndDown(controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis());
+      } 
+    }
+    elev.elevUpAndDown(controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis());
     
 
     
@@ -96,6 +96,6 @@ public class ElevatorCom extends Command {
   @Override
   public boolean isFinished() {
     System.out.println("FINISHED THIS ELEVATOR CODE IS FINISHED FINISHED FINISHED FINISHED");
-    return elev.getEncoderPos() >= 5.305;
+    return elev.getEncoderPos() >= 15;
   }
 }
