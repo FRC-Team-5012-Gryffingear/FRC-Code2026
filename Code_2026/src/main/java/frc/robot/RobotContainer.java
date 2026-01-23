@@ -88,7 +88,7 @@ public class RobotContainer {
       })
     );
 
-    driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, limelight, 18, 0.864, 0));
+    driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, limelight, 18, 1.0, 0));
 
     driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
 
@@ -96,18 +96,18 @@ public class RobotContainer {
       ()-> drivebase.getSwerveDrive().drive(
         new ChassisSpeeds(LimelightHelpers.getTY("limelight-daniel")* -0.1,
         -driverXbox.getLeftX() * 2.0,
-        LimelightHelpers.getTX("limelight-daniel") *-0.05)
+        LimelightHelpers.getTX("limelight-daniel") *-0.075)
       ),drivebase
     ));
 
 
     operatorController.leftBumper().onTrue(new intakeState1(intake));
     operatorController.rightBumper().onTrue(new intakeState2(intake));
-    operatorController.y().whileTrue(new ElevatorCom(elev, operatorController, 15)); //1st level 0.75
-    operatorController.a().whileTrue(new ElevatorCom(elev,operatorController, 15)); // 2st level 2.41
-    operatorController.b().whileTrue(new ElevatorCom(elev,operatorController, 15)); // 3nd level 5.2 
-    operatorController.x().whileTrue(new ElevatorCom(elev, operatorController, 15)); // 4rd level  9.65
-    operatorController.leftStick().whileTrue(new ElevatorCom(elev, operatorController, 15)); // Human player station  1.2
+    // operatorController.y().whileTrue(new ElevatorCom(elev, operatorController, 15)); //1st level 0.75
+    // operatorController.a().whileTrue(new ElevatorCom(elev,operatorController, 15)); // 2st level 2.41
+    // operatorController.b().whileTrue(new ElevatorCom(elev,operatorController, 15)); // 3nd level 5.2 
+    // operatorController.x().whileTrue(new ElevatorCom(elev, operatorController, 15)); // 4rd level  9.65
+    // operatorController.leftStick().whileTrue(new ElevatorCom(elev, operatorController, 15)); // Human player station  1.2
   }
 
   /**

@@ -19,11 +19,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
+import limelight.networktables.LimelightData;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 
@@ -32,6 +37,7 @@ public class SwerveSubsystem extends SubsystemBase {
   Pose2d startingPose = new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)), Rotation2d.fromDegrees(0));
   File directory = new File(Filesystem.getDeployDirectory(),"swerve");
   SwerveDrive  swerveDrive;
+  private final Field2d field = new Field2d();
 
   public SwerveSubsystem() {
     try
@@ -71,7 +77,13 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    var llmeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-daniel");
+    if(llmeasurement != null && llmeasurement.tagCount > 0){
+      swerveDrive.resetOdometry(new Pose2d(llmeasurement.pose.getY(), llmeasurement.pose.getX(), swerveDrive.getOdometryHeading()));
+    }
+    field.setRobotPose(swerveDrive.getPose());
+    SmartDashboard.putData(field);
+        // This method will be called once per scheduler run
   }
 
   @Override
