@@ -23,7 +23,7 @@ public class Talons extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   TalonFX talon1 = new TalonFX(1);
   TalonFX talon2 = new TalonFX(2);
-  TalonFX talon3 = new TalonFX(3);
+  TalonFX talon3 = new TalonFX(17);
   SparkMax PWM = new SparkMax(14, MotorType.kBrushed);
   public Talons()  {
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -60,9 +60,9 @@ public class Talons extends SubsystemBase {
     // talon1.setControl(setpoint);
     // talon2.setControl(setpoint);
     // talon3.setControl(setpoint);
-    talon1.set(0.5);
-    talon2.set(-0.3 * targetRPM);
-    talon3.set(-targetRPM);
+    // talon1.set(0.5);
+    // talon2.set(-0.3 * targetRPM);
+    talon3.set(-0.5);
   }
 
   public Command Motor(double rpm){
