@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Talons extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  // TalonFX talon1 = new TalonFX(1);
+  TalonFX talon1 = new TalonFX(1);
   TalonFX talon2 = new TalonFX(2);
   TalonFX talon3 = new TalonFX(3);
   SparkMax PWM = new SparkMax(14, MotorType.kBrushed);
@@ -34,7 +34,7 @@ public class Talons extends SubsystemBase {
     gains.kV = 0.12;  // Key: output per RPS target
     gains.kS = 0.05;  // Static friction
 
-    // talon1.getConfigurator().apply(config);
+    talon1.getConfigurator().apply(config);
     talon2.getConfigurator().apply(config);
     talon3.getConfigurator().apply(config);
   }
@@ -60,7 +60,8 @@ public class Talons extends SubsystemBase {
     // talon1.setControl(setpoint);
     // talon2.setControl(setpoint);
     // talon3.setControl(setpoint);
-    // talon2.set(-0.3 * targetRPM);
+    talon1.set(0.5);
+    talon2.set(-0.3 * targetRPM);
     talon3.set(-targetRPM);
   }
 
