@@ -89,4 +89,12 @@ public class RobotContainer {
     //   });
     // return new intakeState2(intake);
   }
+    public Command getAutonomousCommand() {
+    // An example command will be run in autonomous
+    //  return Commands.runOnce(() -> {
+    //     intake.toggle();
+    //   });
+    // return new intakeState2(intake);
+    return new DriveDistance(drivebase, 0, 0, 0);
+  }
 }
