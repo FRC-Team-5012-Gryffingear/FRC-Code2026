@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveDistance;
 
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -15,6 +16,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -29,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem();
+  private final ShooterSubsystem shooter = new ShooterSubsystem();
   // The robot's subsystems and commands are defined here...
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -42,13 +45,14 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(), () -> driverXbox.getLeftY() * -1, () -> driverXbox.getLeftX() * -1)
   .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
   .deadband(OperatorConstants.DEADBAND)
-  .scaleTranslation(1.8)
+  .scaleTranslation(0.1)
   .allianceRelativeControl(true);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    shooter.setDefaultCommand(shooter.stopMotorCommand());
   }
 
   /**
@@ -73,7 +77,16 @@ public class RobotContainer {
       })
     );
 
-    driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
+    // driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
+    operatorController.a().whileTrue(shooter.intakeFuelCommand(2000, 1800));
+
+    operatorController.y().onTrue(shooter.activateShooter());
+    operatorController.x().onTrue(shooter.disableShooter());
+
+    // operatorController.x().whileTrue(shooter.shootFuelCommand(2000, 2000));
+
+    operatorController.b().whileTrue(shooter.outtakeFuelCommand(2000, 2000));
+  
   }
 
   /**
