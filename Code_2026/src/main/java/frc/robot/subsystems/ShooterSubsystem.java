@@ -66,6 +66,11 @@ public class ShooterSubsystem extends SubsystemBase {
     hopperMotor.setControl(hopperSetPoint);
   }
 
+  private double getCalculatedSpeed() {
+    // TODO: Calculate based on AprilTag distance and angle
+    return 2000.0; // Placeholder
+}
+
   public void getHopperRPM(){
     SmartDashboard.putNumber("HopperRPM", hopperMotor.get() * 6380.0);
   }
@@ -87,6 +92,16 @@ public class ShooterSubsystem extends SubsystemBase {
       runMotors(intakeRPM, -hopperRPM);
     });
   }
+
+  public Command toggleShooterMotor() {
+    return run(() -> {
+        double calculatedSpeed = getCalculatedSpeed(); // Returns 2000 for now
+        VelocityVoltage shooterSetPoint = new VelocityVoltage(calculatedSpeed/60).withSlot(0);
+        shooterMotor.setControl(shooterSetPoint);
+    })
+    .withName("ShooterMotorToggle");
+}
+
 
   public Command stopMotorCommand(){
     return run (()->{
