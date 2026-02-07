@@ -59,11 +59,10 @@ public class ShooterSubsystem extends SubsystemBase {
         });
   }
 
-  public void runMotors(double intakeRPM, double hopperRPM){
-    VelocityVoltage intakeSetPoint = new VelocityVoltage(intakeRPM/60).withSlot(0);
-    VelocityVoltage hopperSetPoint = new VelocityVoltage(hopperRPM/60).withSlot(0);
-    intakeMotor.setControl(intakeSetPoint);
-    hopperMotor.setControl(hopperSetPoint);
+  public void runMotors(double intakeRPM, double hopperRPM, double shooterRPM){
+    intakeMotor.set(intakeRPM);
+    hopperMotor.set(hopperRPM);
+    shooterMotor.set(shooterRPM);
   }
 
   public void shootMotors(double shooterRPM){
