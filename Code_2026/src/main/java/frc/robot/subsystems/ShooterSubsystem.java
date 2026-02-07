@@ -114,7 +114,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double calculateShooterVelocity(){
-    return 2000;
+    return 80;
   }
 
   public Command turnOffShooterSystemCommand(){
@@ -144,7 +144,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Command shootFuel(double intakeRPS, double hopperRPS){
     return run(() ->{
-      intakeOn(intakeRPS);
+      intakeOn(-intakeRPS);
       hopperOn(-hopperRPS);
     });
   }
@@ -162,7 +162,7 @@ public class ShooterSubsystem extends SubsystemBase {
             }, this),
             Commands.waitSeconds(1.0),
             Commands.runOnce(() -> {
-              intakeOn(-intakeRPS);
+              intakeOn(intakeRPS);
             }, this)
         );
   }

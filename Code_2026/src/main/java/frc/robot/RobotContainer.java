@@ -52,7 +52,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-    shooter.setDefaultCommand(shooter.turnOffIntakeHopperSystemCommand());
+    shooter.setDefaultCommand(shooter.turnOffShooterSystemCommand());
   }
 
   /**
@@ -80,7 +80,7 @@ public class RobotContainer {
     // driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
     operatorController.a().whileTrue(shooter.intakeFuel(2000/60, 1800/60));
 
-    operatorController.rightBumper().onTrue(shooter.loadShooter());
+    operatorController.rightBumper().whileTrue(shooter.loadShooter());
     operatorController.leftBumper().onTrue(shooter.turnOffShooterCommand());
 
     driverXbox.x().whileTrue(shooter.shootFuel(2000/60, 2000/60));
