@@ -29,7 +29,7 @@ public class ShooterSubsystem extends SubsystemBase {
   TalonFX shooterMotor = new TalonFX(3);
   TalonFX intakeMotor = new TalonFX(2);
   TalonFX hopperMotor = new TalonFX(1);
-  boolean toggle = true;
+  boolean toggle = false;
   public ShooterSubsystem()  {
     TalonFXConfiguration config = new TalonFXConfiguration();
     Slot0Configs gains = config.Slot0;
@@ -83,7 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Command shootFuelCommand(double intakeRPM, double hopperRPM){
     return run(()->{
-      runMotors(-intakeRPM, -hopperRPM);
+      runMotors(-intakeRPM, hopperRPM);
     });
   }
 
@@ -122,7 +122,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double calculateShooterPower(){
-    return 2000;
+    return 0;
   }
 
   /**

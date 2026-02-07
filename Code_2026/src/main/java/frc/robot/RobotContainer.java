@@ -45,7 +45,7 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(), () -> driverXbox.getLeftY() * -1, () -> driverXbox.getLeftX() * -1)
   .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
   .deadband(OperatorConstants.DEADBAND)
-  .scaleTranslation(0.1)
+  .scaleTranslation(1.8)
   .allianceRelativeControl(true);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -80,9 +80,9 @@ public class RobotContainer {
     // driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
     operatorController.a().whileTrue(shooter.intakeFuelCommand(2000, 1800));
 
-    operatorController.a().toggleOnTrue(shooter.toggleShooterMotor());
+    driverXbox.b().whileTrue(shooter.toggleShooterMotor());
 
-    // operatorController.x().whileTrue(shooter.shootFuelCommand(2000, 2000));
+    driverXbox.x().whileTrue(shooter.shootFuelCommand(2000, 2000));
 
     operatorController.b().whileTrue(shooter.outtakeFuelCommand(2000, 2000));
   
