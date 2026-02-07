@@ -38,7 +38,7 @@ public class ShooterSubsystem extends SubsystemBase {
     gains.kD = 0.01;
     gains.kV = 0.12;  // Key: output per RPS target
     gains.kS = 0.05;  // Static friction
-    // config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     intakeMotor.getConfigurator().apply(config);
     hopperMotor.getConfigurator().apply(config);
@@ -66,6 +66,12 @@ public class ShooterSubsystem extends SubsystemBase {
     hopperMotor.setControl(hopperSetPoint);
   }
 
+  public void shootMotors(double shooterRPM){
+        VelocityVoltage shooterSetPoint = new VelocityVoltage(shooterRPM/60).withSlot(0);
+        shooterMotor.setControl(shooterSetPoint);
+    }
+  
+
   private double getCalculatedSpeed() {
     // TODO: Calculate based on AprilTag distance and angle
     return 2000.0; // Placeholder
@@ -83,7 +89,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Command shootFuelCommand(double intakeRPM, double hopperRPM){
     return run(()->{
-      runMotors(-intakeRPM, hopperRPM);
+      runMotors(intakeRPM, -hopperRPM);
     });
   }
 
@@ -95,9 +101,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Command toggleShooterMotor() {
     return run(() -> {
-        double calculatedSpeed = getCalculatedSpeed(); // Returns 2000 for now
-        VelocityVoltage shooterSetPoint = new VelocityVoltage(calculatedSpeed/60).withSlot(0);
-        shooterMotor.setControl(shooterSetPoint);
+        shootMotors(-getCalculatedSpeed());
     })
     .withName("ShooterMotorToggle");
 }
@@ -106,6 +110,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command stopMotorCommand(){
     return run (()->{
       runMotors(0, 0);
+      shootMotors(0);
     });
   }
 
@@ -143,11 +148,11 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     getHopperRPM();
-    if(toggle){
-      activateShootMotor(-calculateShooterPower());
-    }else{
-      activateShootMotor(0);
-    }
+    // if(toggle){
+    //   activateShootMotor(-calculateShooterPower());
+    // }else{
+    //   activateShootMotor(0);
+    // }
     
     // This method will be called once per scheduler run
   }

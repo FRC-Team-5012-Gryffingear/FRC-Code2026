@@ -80,7 +80,7 @@ public class RobotContainer {
     // driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
     operatorController.a().whileTrue(shooter.intakeFuelCommand(2000, 1800));
 
-    driverXbox.b().whileTrue(shooter.toggleShooterMotor());
+    operatorController.y().whileTrue(shooter.toggleShooterMotor());
 
     driverXbox.x().whileTrue(shooter.shootFuelCommand(2000, 2000));
 
