@@ -6,20 +6,17 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveDistance;
+import frc.robot.commands.shooterComm;
+import frc.robot.subsystems.shooterSubsys;
 
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import static edu.wpi.first.units.Units.RPM;
+
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
-
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -31,18 +28,18 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem();
-  private final ShooterSubsystem shooter = new ShooterSubsystem();
-  // The robot's subsystems and commands are defined here...
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final shooterSubsys shooter = new shooterSubsys();
+  
+  // Controllers
   private final CommandXboxController driverXbox =
       new CommandXboxController(OperatorConstants.DriverContrlPort);
   
   private final CommandXboxController operatorController = 
       new CommandXboxController(OperatorConstants.OperatorContrlPort);
 
-  
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(), () -> driverXbox.getLeftY() * -1, () -> driverXbox.getLeftX() * -1)
+  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(), 
+      () -> driverXbox.getLeftY() * -1, 
+      () -> driverXbox.getLeftX() * -1)
   .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
   .deadband(OperatorConstants.DEADBAND)
   .scaleTranslation(1.8)
@@ -50,63 +47,61 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the trigger bindings
     configureBindings();
-    shooter.setDefaultCommand(shooter.stopMotorCommand());
+    // Set shooter default to idle
+    shooter.setDefaultCommand(Commands.runOnce(() -> {}, shooter));
   }
 
   /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
+   * Use this method to define your trigger->command mappings.
    */
   private void configureBindings() {
+    // Drive default command
     Command drivefieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
     drivebase.setDefaultCommand(drivefieldOrientedAngularVelocity);
-    driverXbox.a().onTrue(
-      Commands.runOnce(() -> {
+    
+    // Driver reset odometry
+    driverXbox.a().onTrue(Commands.runOnce(() -> {
         Pose2d currentPose = drivebase.getSwerveDrive().getPose();
-        Pose2d newPose = new Pose2d(
-          currentPose.getTranslation(), Rotation2d.fromDegrees(0)
-        );
+        Pose2d newPose = new Pose2d(currentPose.getTranslation(), Rotation2d.fromDegrees(0));
         drivebase.getSwerveDrive().resetOdometry(newPose);
-      })
+      }, drivebase)
     );
 
-    // driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
-    operatorController.a().whileTrue(shooter.intakeFuelCommand(2000, 1800));
+    driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
 
-    operatorController.y().whileTrue(shooter.toggleShooterMotor());
+    // Operator shooter controls - fixed syntax
+    // operatorController.a().whileTrue(
+    //     Commands.parallel(
+    //         Commands.run(() -> shooter.setIntake(-0.75), shooter),  // Intake reverse
+    //         shooter.setHopperVelocity(-1500)                         // Hopper reverse
+    //     ).finallyDo(() -> shooter.setIntake(0))
+    // );
 
-    driverXbox.x().whileTrue(shooter.shootFuelCommand(2000, 2000));
+    // operatorController.b().whileTrue(
+    //     Commands.parallel(
+    //         Commands.run(() -> shooter.setIntake(0.75), shooter),    // Intake forward
+    //         shooter.setHopperVelocity(1500),                               // Hopper forward
+    //         shooter.setShooterVelocity(2000)                               // Shooter forward (index speed)
+    //     ).finallyDo(() -> shooter.setIntake(0))
+    // );
 
-    operatorController.b().whileTrue(shooter.outtakeFuelCommand(2000, 2000));
-  
+    operatorController.rightTrigger().whileTrue(new shooterComm(shooter));  // Full shoot
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-      * @return 
-      *
-      * @return the command to run in autonomous
-      */
-     public void Command () {
-    // An example command will be run in autonomous
-    //  return Commands.runOnce(() -> {
-    //     intake.toggle();
-    //   });
-    // return new intakeState2(intake);
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return Commands.sequence(
+        new DriveDistance(drivebase, 0.74, 0, 1.0),
+        new shooterComm(shooter)  // Shoot after drive
+    );
   }
-    public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    //  return Commands.runOnce(() -> {
-    //     intake.toggle();
-    //   });
-    // return new intakeState2(intake);
-    return new DriveDistance(drivebase, 0, 0, 0);
-  }
+  
+  // Public accessors
+  public shooterSubsys getShooter() { return shooter; }
+  public SwerveSubsystem getDrivebase() { return drivebase; }
 }

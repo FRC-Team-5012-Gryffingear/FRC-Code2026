@@ -20,6 +20,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,6 +33,7 @@ public class ShooterSubsystem extends SubsystemBase {
   TalonFX hopperMotor = new TalonFX(1);
   boolean toggle = false;
   public ShooterSubsystem()  {
+    SmartDashboard.putNumber("RPM Setpoint", 0.0);
     TalonFXConfiguration config = new TalonFXConfiguration();
     Slot0Configs gains = config.Slot0;
     gains.kP = 0.11;  // Tune: output per RPS error
@@ -80,21 +83,21 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("HopperRPM", hopperMotor.get() * 6380.0);
   }
 
-  public Command intakeFuelCommand(double intakeRPM, double hopperRPM){
+  public Command intakeFuelCommand(double intakeRPM, double hopperRPM, double shooterRPM){
     return run(() ->{
-      runMotors(-intakeRPM, hopperRPM);
+      runMotors(-intakeRPM, hopperRPM, shooterRPM);
     });
   }
 
-  public Command shootFuelCommand(double intakeRPM, double hopperRPM){
+  public Command shootFuelCommand(double intakeRPM, double hopperRPM, double shooterRPM){
     return run(()->{
-      runMotors(intakeRPM, -hopperRPM);
+      runMotors(intakeRPM, -hopperRPM, shooterRPM);
     });
   }
 
-  public Command outtakeFuelCommand(double intakeRPM, double hopperRPM){
+  public Command outtakeFuelCommand(double intakeRPM, double hopperRPM, double shooterRPM){
     return run(() ->{
-      runMotors(intakeRPM, -hopperRPM);
+      runMotors(intakeRPM, -hopperRPM, shooterRPM);
     });
   }
 
@@ -108,7 +111,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Command stopMotorCommand(){
     return run (()->{
-      runMotors(0, 0);
+      runMotors(0, 0,0);
       shootMotors(0);
     });
   }
@@ -147,6 +150,13 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     getHopperRPM();
+    double rpmSetpoint = SmartDashboard.getNumber("RPM Setpoint", 0.0);
+    // Simple example: map RPM to motor output (you'll probably use closed-loop control)
+    double output = rpmSetpoint / 6000.0; // if 6000 is your max RPM
+    output = Math.max(-1.0, Math.min(1.0, output)); // clamp to [-1,1]
+    shooterMotor.set(output);
+    
+
     // if(toggle){
     //   activateShootMotor(-calculateShooterPower());
     // }else{
