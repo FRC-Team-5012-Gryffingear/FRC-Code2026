@@ -19,6 +19,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.networktables.GenericEntry; // Or NetworkTableEntry for older versions
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -29,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem();
   private final shooterSubsys shooter = new shooterSubsys();
+  private GenericEntry shooterSpeedSlider;
   
   // Controllers
   private final CommandXboxController driverXbox =
@@ -87,6 +92,15 @@ public class RobotContainer {
     // );
 
     operatorController.rightTrigger().whileTrue(new shooterComm(shooter));  // Full shoot
+
+    shooterSpeedSlider = Shuffleboard.getTab("Shooter")
+      .add("Shooter Speed", 2000) // Default value
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("min", 0, "max", 5000)) // Range for RPM
+      .getEntry();
+
+  configureBindings();
+  shooter.setDefaultCommand(Commands.runOnce(() -> {}, shooter));
   }
 
   /**
@@ -104,4 +118,5 @@ public class RobotContainer {
   // Public accessors
   public shooterSubsys getShooter() { return shooter; }
   public SwerveSubsystem getDrivebase() { return drivebase; }
+  
 }

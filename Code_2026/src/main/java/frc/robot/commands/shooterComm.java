@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.units.measure.AngularVelocity;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.function.DoubleSupplier;
+
 /** An example command that uses an example subsystem. */
 public class shooterComm extends Command {
   @SuppressWarnings("PMD.UnusedPrivateField")
@@ -18,13 +20,15 @@ public class shooterComm extends Command {
   private final double INTAKE_DUTY = 0.76;
   private final double VELOCITY_TOLERANCE_RPS = 10.0; // +/- tolerance for "at speed"
   private AngularVelocity m_targetShooterVel;
+  private final DoubleSupplier m_speedSupplier;
   /**
    * Creates a new shooterComm.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public shooterComm(shooterSubsys subsystem) {
+  public shooterComm(shooterSubsys subsystem, DoubleSupplier speedSupplier) {
     m_subsystem = subsystem;
+    m_speedSupplier = speedSupplier;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
     m_targetShooterVel = AngularVelocity.ofBaseUnits(SHOOTER_RPM / 60.0, RotationsPerSecond);
