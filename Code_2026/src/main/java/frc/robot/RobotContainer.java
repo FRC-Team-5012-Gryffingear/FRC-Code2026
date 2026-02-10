@@ -55,7 +55,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-    shooter.setDefaultCommand(shooter.turnOffShooterSystemCommand());
+    shooter.setDefaultCommand(Commands.none()); // does nothing
     // autoChooser = AutoBuilde r.buildAutoChooser();
   }
 

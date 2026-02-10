@@ -32,6 +32,8 @@ public class ShooterSubsystem extends SubsystemBase {
   TalonFX shooterMotor = new TalonFX(3);
   TalonFX intakeMotor = new TalonFX(2);
   TalonFX hopperMotor = new TalonFX(1);  
+  private boolean shooterRunning = false;
+
 
   private final MotionMagicVelocityVoltage shooterMMReq   = new MotionMagicVelocityVoltage(0);
   private final MotionMagicVelocityVoltage intakeMMReq = new MotionMagicVelocityVoltage(0);
@@ -51,14 +53,15 @@ public class ShooterSubsystem extends SubsystemBase {
     TalonFXConfiguration config = new TalonFXConfiguration();
     Slot0Configs gains = config.Slot0;
     gains.kP = 0.11;  // Tune: output per RPS error
-    gains.kI = 0.5;
+    gains.kI = 0.01;
     gains.kD = 0.01;
     gains.kV = 0.12;  // Key: output per RPS target
     gains.kS = 0.05;  // Static friction
 
     var motionMagic = config.MotionMagic;
-    motionMagic.MotionMagicCruiseVelocity = 400; 
-    motionMagic.MotionMagicAcceleration = 4000;
+    motionMagic.MotionMagicCruiseVelocity = 0;  // Not used for velocity
+    motionMagic.MotionMagicAcceleration = 4000; // OK as fallback
+
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
@@ -122,10 +125,9 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public Command turnOffShooterSystemCommand(){
-    return run(()->{
-      turnOffShooterSystem();
-    });
-  }
+    return Commands.runOnce(this::turnOffShooterSystem, this);
+}
+
 
   public Command turnOffIntakeHopperSystemCommand(){
     return run(()->{
@@ -172,12 +174,27 @@ public class ShooterSubsystem extends SubsystemBase {
     });
   }
 
-  public Command loadShooter(){
-    return run(()-> {
-      shooterOn(-calculateShooterVelocity());
-    });
-  }
+  public Command getShooterToggleCommand() {
+    return Commands.runOnce(
+        () -> {
+            if (shooterRunning) {
+                shooterOff();
+            } else {
+                shooterOn(calculateShooterVelocity());
+            }
+            shooterRunning = !shooterRunning;
+        },
+        this
+    );
+}
 
+public Command shooterRunCommand() {
+    return run(
+        () -> shooterOn(calculateShooterVelocity())
+    ).finallyDo(
+        () -> shooterOff()
+    );
+}
   public Command outtakeFuel(double intakeRPS, double hopperRPS){
         return Commands.sequence(
             Commands.runOnce(() -> {
