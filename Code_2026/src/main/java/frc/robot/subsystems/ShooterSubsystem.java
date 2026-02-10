@@ -100,7 +100,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void intakeOff(){
     intakeMMReq.Acceleration = INTAKE_ACCEL_DOWN;
-    intakeMotor.setControl(intakeMMReq.withVelocity(0));
+    if(Math.abs(intakeMotor.getVelocity().getValueAsDouble()) > 1){
+      intakeMotor.setControl(intakeMMReq.withVelocity(0));
+    } else{
+      intakeMotor.set(0);
+    }
   }
 
   public void shooterOff(){
@@ -136,10 +140,29 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public Command intakeFuel(double intakeRPS, double hopperRPS){
-    return run(() ->{
-      intakeOn(-intakeRPS);
-      hopperOn(hopperRPS);
-    });
+     return Commands.sequence(
+            Commands.runOnce(() -> {
+              hopperOn(hopperRPS);
+            }, this),
+            Commands.waitSeconds(1.0),
+            Commands.run(() -> {
+              hopperOn(hopperRPS);
+              intakeOn(-intakeRPS);
+            }, this)
+        );
+  }
+
+  public Command shootFuelCommand(double intakeRPS, double hopperRPS){
+    return Commands.sequence(
+      Commands.runOnce(() -> {        shooterOn(-calculateShooterVelocity());
+}, this),
+      Commands.waitSeconds(1.0),
+      Commands.run(() -> {
+        shooterOn(-calculateShooterVelocity());
+        intakeOn(-intakeRPS);
+        hopperOn(-hopperRPS);
+      }, this)
+    );
   }
 
   public Command shootFuel(double intakeRPS, double hopperRPS){
@@ -158,10 +181,11 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command outtakeFuel(double intakeRPS, double hopperRPS){
         return Commands.sequence(
             Commands.runOnce(() -> {
-              hopperOn(-hopperRPS);
+              intakeOn(intakeRPS);
             }, this),
             Commands.waitSeconds(1.0),
-            Commands.runOnce(() -> {
+            Commands.run(() -> {
+              hopperOn(-hopperRPS);
               intakeOn(intakeRPS);
             }, this)
         );
@@ -200,6 +224,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("intakeRPS", intakeMotor.getVelocity().getValueAsDouble());
     // This method will be called once per scheduler run
   }
 

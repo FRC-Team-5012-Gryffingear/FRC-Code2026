@@ -10,10 +10,12 @@ import java.io.File;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -100,6 +102,7 @@ public class SwerveSubsystem extends SubsystemBase {
     });
 }
 
+
     public void setupPathPlanner()
   {
     // Load the RobotConfig from the GUI settings. You should probably
@@ -109,7 +112,6 @@ public class SwerveSubsystem extends SubsystemBase {
     try
     {
       config = RobotConfig.fromGUISettings();
-
       // Configure AutoBuilder last
       AutoBuilder.configure(
           swerveDrive::getPose,
@@ -156,11 +158,16 @@ public class SwerveSubsystem extends SubsystemBase {
       e.printStackTrace();
     }
 
+
     //Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
-
   }
+  public Command getAutonmusCommand(String pathName)
+    {
+    return new PathPlannerAuto(pathName);
+   }
+   
 
 
 
