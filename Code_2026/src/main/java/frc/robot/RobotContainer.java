@@ -5,18 +5,27 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ChaseAprilTagCommand;
 import frc.robot.commands.DriveDistance;
-
+import frc.robot.commands.VibrateCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.IntakeHopsubsys;
+import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.climberSubsys;
 import swervelib.SwerveInputStream;
+import swervelib.simulation.ironmaple.simulation.IntakeSimulation;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +43,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem();
   private final ShooterSubsystem shooter = new ShooterSubsystem();
+  private final IntakeHopsubsys intake = new IntakeHopsubsys();
+  private final LimelightSubsystem lime = new LimelightSubsystem();
+  private final SendableChooser<Command> autoChooser;
+  private final climberSubsys climber = new climberSubsys();
+
   // private final SendableChooser<Command> autoChooser;
   // The robot's subsystems and commands are defined here...
 
@@ -55,9 +69,24 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-    shooter.setDefaultCommand(Commands.none()); // does nothing
+    shooter.setDefaultCommand(shooter.getDefaultCommand()); // does nothing
     // autoChooser = AutoBuilde r.buildAutoChooser();
+    intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
+        //Create the NamedCommands that will be used in PathPlanner
+    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+
+    //Have the autoChooser pull in all PathPlanner autos as options
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    // //Set the default auto (do nothing) 
+    autoChooser.setDefaultOption("Do Nothing", Commands.none());
+    autoChooser.addOption("routine", new PathPlannerAuto("Example Auto"));
+
+    //Put the autoChooser on the SmartDashboard
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+    
   }
+
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -80,14 +109,29 @@ public class RobotContainer {
         drivebase.getSwerveDrive().resetOdometry(newPose);
       })
     );
+     driverXbox.y().whileTrue(new RunCommand(
+      ()-> drivebase.getSwerveDrive().drive(
+        new ChassisSpeeds(LimelightHelpers.getTY("limelight-calvin")* 0.1,
+        -driverXbox.getLeftX() * 2.0,
+        LimelightHelpers.getTX("limelight-calvin") *-0.075)
+      ),drivebase
+    ));
 
     // driverXbox.x().onTrue(new DriveDistance(drivebase, 1, 0, 1));
-    operatorController.a().whileTrue(shooter.intakeFuel(25, 1800/60));
+    operatorController.rightBumper()
+    .onTrue(shooter.getShooterToggleCommand());
 
-    driverXbox.x().whileTrue(shooter.shootFuelCommand(25, 2000/60));
+    operatorController.a().whileTrue(intake.intakeFuel(25, 16.67));
 
-    operatorController.b().whileTrue(shooter.outtakeFuel(25, 2000/60));
+    operatorController.x().whileTrue(intake.shootFuel(15,16.67));
+
+    operatorController.b().whileTrue(intake.outtakeFuel(25, 16.67));
   
+    driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0));
+
+    operatorController.rightTrigger().whileTrue(climber.CliUp());
+
+    operatorController.leftTrigger().whileTrue(climber.CliDown());
   }
 
   /**
@@ -109,6 +153,16 @@ public class RobotContainer {
     //     intake.toggle();
     //   });
     // return new intakeState2(intake);
-    return new DriveDistance(drivebase, 0, 0, 0);
+    return new PathPlannerAuto("auto ian is diddy");
+    
+    
+//     Commands.sequence(
+//       shooter.getShooterToggleCommand(),
+//       new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0),
+//       Commands.waitSeconds(.5 ),
+//       Commands.parallel(
+//         new VibrateCommand(drivebase),
+//         intake.shootFuel(25, 16.67))
+//       );
 }
 }

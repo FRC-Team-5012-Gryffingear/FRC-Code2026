@@ -27,22 +27,28 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class IntakeHopsubsys extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  TalonFX shooterMotor = new TalonFX(3);
-  private boolean shooterRunning = false;
+ 
+  TalonFX intakeMotor = new TalonFX(2);
+  TalonFX hopperMotor = new TalonFX(1);  
+ 
 
 
-  private final MotionMagicVelocityVoltage shooterMMReq   = new MotionMagicVelocityVoltage(0);
-
+  private final MotionMagicVelocityVoltage intakeMMReq = new MotionMagicVelocityVoltage(0);
+  private final MotionMagicVelocityVoltage hopperMMReq  = new MotionMagicVelocityVoltage(0);
 
   // Acceleration when spinning UP (fast)
-  private static final double SHOOTER_ACCEL_UP   = 800.0; // rps/s
- 
+
+  private static final double INTAKE_ACCEL_UP = 600.0;
+  private static final double HOPPER_ACCEL_UP  = 1000.0;
+
   // Acceleration when spinning DOWN (slow)
-  private static final double SHOOTER_ACCEL_DOWN   = 100.0; // rps/s
- 
-  public ShooterSubsystem()  {
+
+  private static final double INTAKE_ACCEL_DOWN = 80.0;
+  private static final double HOPPER_ACCEL_DOWN  = 120.0;  
+
+  public IntakeHopsubsys()  {
     TalonFXConfiguration config = new TalonFXConfiguration();
     Slot0Configs gains = config.Slot0;
     gains.kP = 0.11;  // Tune: output per RPS error
@@ -59,81 +65,108 @@ public class ShooterSubsystem extends SubsystemBase {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
 
- 
-    shooterMotor.getConfigurator().apply(config);
-
-    shooterMMReq.Acceleration = SHOOTER_ACCEL_DOWN;
-  }  
-
-
-  public void shooterOn(double RPS){
-    shooterMMReq.Acceleration = SHOOTER_ACCEL_UP;
-    shooterMotor.setControl(shooterMMReq.withVelocity(RPS));
-  }
-
- 
-
-  public void turnOffShooterSystem(){
-  
-    shooterOff();
-   
-  }
-
-
-
- 
-
-  public void shooterOff(){
-    shooterMMReq.Acceleration = SHOOTER_ACCEL_DOWN;
-    shooterMotor.setControl(shooterMMReq.withVelocity(0));
-  }
-
-  
-  public double calculateShooterVelocity(){
-    return 63.6;
-  }
-
-  public Command turnOffShooterSystemCommand(){
-    return Commands.runOnce(this::turnOffShooterSystem, this);
-}
+    intakeMotor.getConfigurator().apply(config);
+    hopperMotor.getConfigurator().apply(config);
 
 
   
+    intakeMMReq.Acceleration = INTAKE_ACCEL_DOWN;
+    hopperMMReq.Acceleration = HOPPER_ACCEL_DOWN;
+  }
 
-  public Command turnOffShooterCommand(){
+  public void intakeOn(double RPS){
+    intakeMMReq.Acceleration = INTAKE_ACCEL_UP;
+    intakeMotor.setControl(intakeMMReq.withVelocity(RPS));
+  }
+
+ 
+  
+
+  public void hopperOn(double RPS){
+    hopperMMReq.Acceleration = HOPPER_ACCEL_UP;
+    hopperMotor.setControl(hopperMMReq.withVelocity(RPS));
+  }
+
+
+  public void turnOffIntakeHopper(){
+    intakeOff();
+    hopperOff();
+  }
+
+  public void intakeOff(){
+    intakeMMReq.Acceleration = INTAKE_ACCEL_DOWN;
+    if(Math.abs(intakeMotor.getVelocity().getValueAsDouble()) > 1){
+      intakeMotor.setControl(intakeMMReq.withVelocity(0));
+    } else{
+      intakeMotor.set(0);
+    }
+  }
+
+ 
+
+  public void hopperOff(){
+    hopperMMReq.Acceleration = HOPPER_ACCEL_DOWN;
+    if(Math.abs(hopperMotor.getVelocity().getValueAsDouble()) > 1  ){
+        hopperMotor.setControl(hopperMMReq.withVelocity(0));
+    } else{
+        hopperMotor.set(0);
+
+    }
+  
+  }
+
+  
+  
+
+
+
+
+
+  public Command turnOffIntakeHopperSystemCommand(){
     return run(()->{
-      shooterOff();
+      turnOffIntakeHopper();
     });
   }
 
-  
-
-  
-
-  
-  public Command getShooterToggleCommand() {
-    return Commands.runOnce(
-        () -> {
-            if (shooterRunning) {
-                shooterOff();
-            } else {
-                shooterOn(-calculateShooterVelocity());
-            }
-            shooterRunning = !shooterRunning;
-        },
-        this
-    );
-}
-
-public Command shooterRunCommand() {
-    return run(
-        () -> shooterOn(calculateShooterVelocity())
-    ).finallyDo(
-        () -> shooterOff()
-    );
 
 
-}
+  public Command intakeFuel(double intakeRPS, double hopperRPS){
+     return Commands.sequence(
+            Commands.runOnce(() -> {
+              hopperOn(hopperRPS);
+            }, this),
+            Commands.waitSeconds(1.0),
+            Commands.run(() -> {
+              hopperOn(hopperRPS);
+              intakeOn(-intakeRPS);
+            }, this)
+        );
+  }
+
+
+
+  public Command shootFuel(double intakeRPS, double hopperRPS){
+    return run(() ->{
+      intakeOn(-intakeRPS);
+      hopperOn(-hopperRPS);
+    });
+  }
+
+
+
+
+  public Command outtakeFuel(double intakeRPS, double hopperRPS){
+        return Commands.sequence(
+            Commands.runOnce(() -> {
+              intakeOn(intakeRPS);
+            }, this),
+            Commands.waitSeconds(1.0),
+            Commands.run(() -> {
+              hopperOn(-hopperRPS);
+              intakeOn(intakeRPS);
+            }, this)
+        );
+  }
 
 
 
@@ -168,6 +201,8 @@ public Command shooterRunCommand() {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("intakeRPS", intakeMotor.getVelocity().getValueAsDouble());
+    // This method will be called once per scheduler run
   }
 
   @Override
