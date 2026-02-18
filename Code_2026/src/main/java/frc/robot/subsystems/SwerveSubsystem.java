@@ -44,7 +44,7 @@ public class SwerveSubsystem extends SubsystemBase {
       throw new RuntimeException(e);
     }
 
-    setupPathPlanner2();
+    setupPathPlanner();
   }
 
   /**
@@ -73,6 +73,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    swerveDrive.updateOdometry();
     // This method will be called once per scheduler run
   }
 
@@ -129,9 +130,9 @@ public class SwerveSubsystem extends SubsystemBase {
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(7.798, 0.0, 0.04),
+              new PIDConstants(0.0001, 0.0, 0.0),
               // Translation
-              new PIDConstants(7.175, 0.0, 0)
+              new PIDConstants(8.885, 0.0, 0)
               // Rotation PID constants 
           ),
           config,

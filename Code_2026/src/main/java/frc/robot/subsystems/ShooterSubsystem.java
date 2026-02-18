@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
 
 public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -41,6 +42,8 @@ public class ShooterSubsystem extends SubsystemBase {
  
   // Acceleration when spinning DOWN (slow)
   private static final double SHOOTER_ACCEL_DOWN   = 100.0; // rps/s
+
+  private double shooterRPS = 63.6;
  
   public ShooterSubsystem()  {
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -63,6 +66,7 @@ public class ShooterSubsystem extends SubsystemBase {
     shooterMotor.getConfigurator().apply(config);
 
     shooterMMReq.Acceleration = SHOOTER_ACCEL_DOWN;
+    SmartDashboard.putNumber("RPS Shooter", shooterRPS);
   }  
 
 
@@ -90,7 +94,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   
   public double calculateShooterVelocity(){
-    return 63.6;
+    return shooterRPS;
   }
 
   public Command turnOffShooterSystemCommand(){
@@ -168,6 +172,14 @@ public Command shooterRunCommand() {
 
   @Override
   public void periodic() {
+    double rpmSetpoint = SmartDashboard.getNumber("RPS Shooter",63.6);
+    shooterRPS = rpmSetpoint;
+    SmartDashboard.putNumber("Distance from Apriltag", 
+    Math.sqrt(LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getX() * 
+    LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getX() +
+    LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getZ() * 
+    LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getZ())
+    );
   }
 
   @Override

@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -12,28 +16,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class climberSubsys extends SubsystemBase {
-    TalonFX climberMotor = new TalonFX(7);
+    TalonSRX climberMotor = new TalonSRX(6);
     private final double kUp = 1;
     private final double kDown = -1;
   /** Creates a new climberSubsys. */
   public climberSubsys() {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    climberMotor.getConfigurator().apply(config);
+   
   }
-  public void climberUp(){
-    climberMotor.setControl(new DutyCycleOut(kUp));
-  }
-  public void climberDown(){
-    climberMotor.setControl(new DutyCycleOut(kDown));
-  }
- 
-  public Command CliDown(){
-    return run(() -> {climberDown();});
-  }
-  public Command CliUp(){
-    return run(() -> {climberUp();});
+  public void climbMove(double power){
+    climberMotor.set(ControlMode.PercentOutput, power);
   }
 
+
+  public Command climb(DoubleSupplier rightTrigger, DoubleSupplier leftTrigger){
+    return run(() -> {
+      climbMove(rightTrigger.getAsDouble() - leftTrigger.getAsDouble());
+    });
+  }
+ 
 
   /**
    * Example command factory method.

@@ -45,7 +45,7 @@ public class RobotContainer {
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final IntakeHopsubsys intake = new IntakeHopsubsys();
   private final LimelightSubsystem lime = new LimelightSubsystem();
-  private final SendableChooser<Command> autoChooser;
+  // private final SendableChooser<Command> autoChooser;
   private final climberSubsys climber = new climberSubsys();
 
   // private final SendableChooser<Command> autoChooser;
@@ -60,7 +60,7 @@ public class RobotContainer {
 
   
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(), () -> driverXbox.getLeftY() * -1, () -> driverXbox.getLeftX() * -1)
-  .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+  .withControllerRotationAxis(() -> driverXbox.getRightX() * -1.4)
   .deadband(OperatorConstants.DEADBAND)
   .scaleTranslation(1.8)
   .allianceRelativeControl(true);
@@ -73,17 +73,17 @@ public class RobotContainer {
     // autoChooser = AutoBuilde r.buildAutoChooser();
     intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
         //Create the NamedCommands that will be used in PathPlanner
-    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    // NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
     //Have the autoChooser pull in all PathPlanner autos as options
-    autoChooser = AutoBuilder.buildAutoChooser();
+    // autoChooser = AutoBuilder.buildAutoChooser();
 
-    // //Set the default auto (do nothing) 
-    autoChooser.setDefaultOption("Do Nothing", Commands.none());
-    autoChooser.addOption("routine", new PathPlannerAuto("Example Auto"));
+    // // //Set the default auto (do nothing) 
+    // autoChooser.setDefaultOption("Do Nothing", Commands.none());
+    // autoChooser.addOption("routine", new PathPlannerAuto("Example Auto"));
 
-    //Put the autoChooser on the SmartDashboard
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    // //Put the autoChooser on the SmartDashboard
+    // SmartDashboard.putData("Auto Chooser", autoChooser);
     
   }
 
@@ -109,10 +109,18 @@ public class RobotContainer {
         drivebase.getSwerveDrive().resetOdometry(newPose);
       })
     );
-     driverXbox.y().whileTrue(new RunCommand(
+    //  driverXbox.y().whileTrue(new RunCommand(
+    //   ()-> drivebase.getSwerveDrive().drive(
+    //     new ChassisSpeeds(LimelightHelpers.getTY("limelight-calvin")* 0.1,
+    //     -driverXbox.getLeftX() * 2.0,
+    //     LimelightHelpers.getTX("limelight-calvin") *-0.075)
+    //   ),drivebase
+    // ));
+
+    driverXbox.y().whileTrue(new RunCommand(
       ()-> drivebase.getSwerveDrive().drive(
-        new ChassisSpeeds(LimelightHelpers.getTY("limelight-calvin")* 0.1,
-        -driverXbox.getLeftX() * 2.0,
+        new ChassisSpeeds(0,
+        0,
         LimelightHelpers.getTX("limelight-calvin") *-0.075)
       ),drivebase
     ));
@@ -129,9 +137,7 @@ public class RobotContainer {
   
     driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0));
 
-    operatorController.rightTrigger().whileTrue(climber.CliUp());
-
-    operatorController.leftTrigger().whileTrue(climber.CliDown());
+    climber.setDefaultCommand(climber.climb(() -> operatorController.getRightTriggerAxis(), () -> operatorController.getLeftTriggerAxis()));
   }
 
   /**
