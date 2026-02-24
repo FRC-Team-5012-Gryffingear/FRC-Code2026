@@ -30,44 +30,58 @@ import frc.robot.LimelightHelpers;
 
 public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  TalonFX shooterMotor = new TalonFX(3);
+  TalonFX shooterMotor = new TalonFX(15);
   private boolean shooterRunning = false;
 
 
-  private final MotionMagicVelocityVoltage shooterMMReq   = new MotionMagicVelocityVoltage(0);
+
+  private final MotionMagicVelocityVoltage shooterMMReq = new MotionMagicVelocityVoltage(0);
+
 
 
   // Acceleration when spinning UP (fast)
-  private static final double SHOOTER_ACCEL_UP   = 800.0; // rps/s
- 
+  private static final double SHOOTER_ACCEL_UP = 800.0; // rps/s
+
   // Acceleration when spinning DOWN (slow)
-  private static final double SHOOTER_ACCEL_DOWN   = 100.0; // rps/s
+  private static final double SHOOTER_ACCEL_DOWN = 100.0; // rps/s
 
   private double shooterRPS = 63.6;
- 
-  public ShooterSubsystem()  {
+
+  public ShooterSubsystem() {
     TalonFXConfiguration config = new TalonFXConfiguration();
     Slot0Configs gains = config.Slot0;
-    gains.kP = 0.11;  // Tune: output per RPS error
+    gains.kP = 0.11; // Tune: output per RPS error
     gains.kI = 0.01;
     gains.kD = 0.01;
-    gains.kV = 0.12;  // Key: output per RPS target
-    gains.kS = 0.05;  // Static friction
+    gains.kV = 0.12; // Key: output per RPS target
+    gains.kS = 0.05; // Static friction
 
     var motionMagic = config.MotionMagic;
-    motionMagic.MotionMagicCruiseVelocity = 0;  // Not used for velocity
-    motionMagic.MotionMagicAcceleration = 4000; // OK as fallback
+    motionMagic.MotionMagicCruiseVelocity = 0; // Not used for velocity
+  motionMagic.MotionMagicAcceleration = 4000; // OK as fallback
+
 
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
 
- 
+
+
+
     shooterMotor.getConfigurator().apply(config);
 
     shooterMMReq.Acceleration = SHOOTER_ACCEL_DOWN;
     SmartDashboard.putNumber("RPS Shooter", shooterRPS);
-  }  
+  }
+  public double getDistanceFromTarget(){
+    double distance = Math.sqrt(LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getX() *
+    LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getX() +
+    LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getZ() *
+    LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getZ());
+    SmartDashboard.putNumber("Distance from Apriltag", distance);
+    return distance;
+  }
+
 
 
   public void shooterOn(double RPS){
@@ -75,26 +89,33 @@ public class ShooterSubsystem extends SubsystemBase {
     shooterMotor.setControl(shooterMMReq.withVelocity(RPS));
   }
 
- 
+
+
+
 
   public void turnOffShooterSystem(){
-  
+
     shooterOff();
-   
+
   }
 
 
 
- 
+
+
+
+
+
 
   public void shooterOff(){
     shooterMMReq.Acceleration = SHOOTER_ACCEL_DOWN;
     shooterMotor.setControl(shooterMMReq.withVelocity(0));
   }
 
-  
-  public double calculateShooterVelocity(){
-    return shooterRPS;
+
+
+  public void calculateShooterVelocity(){
+     
   }
 
   public Command turnOffShooterSystemCommand(){
@@ -102,7 +123,10 @@ public class ShooterSubsystem extends SubsystemBase {
 }
 
 
-  
+
+
+
+
 
   public Command turnOffShooterCommand(){
     return run(()->{
@@ -110,31 +134,37 @@ public class ShooterSubsystem extends SubsystemBase {
     });
   }
 
-  
 
-  
 
-  
-  public Command getShooterToggleCommand() {
+
+
+
+
+
+
+
+
+public Command getShooterToggleCommand() {
     return Commands.runOnce(
         () -> {
             if (shooterRunning) {
                 shooterOff();
             } else {
-                shooterOn(-calculateShooterVelocity());
-            }
-            shooterRunning = !shooterRunning;
+                shooterOn(-shooterRPS);
+          }
+        shooterRunning = !shooterRunning;
         },
-        this
+      this
     );
 }
 
 public Command shooterRunCommand() {
     return run(
-        () -> shooterOn(calculateShooterVelocity())
+        () -> shooterOn(shooterRPS)
     ).finallyDo(
-        () -> shooterOff()
+      () -> shooterOff()
     );
+
 
 
 }
@@ -143,41 +173,48 @@ public Command shooterRunCommand() {
 
 
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
+
+
+
+
+/**
+   * Example command factory method.
+   *
+   * @return a command
+   */
   public Command exampleMethodCommand() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          /* one-time action goes here */
+      /* one-time action goes here */
         });
   }
 
-  
 
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
+
+
+
+/**
+   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
+   *
+   * @return value of some boolean subsystem state, such as a digital sensor.
+   */
   public boolean exampleCondition() {
     // Query some boolean state, such as a digital sensor.
     return false;
   }
 
 
+
   @Override
   public void periodic() {
     double rpmSetpoint = SmartDashboard.getNumber("RPS Shooter",63.6);
     shooterRPS = rpmSetpoint;
-    SmartDashboard.putNumber("Distance from Apriltag", 
-    Math.sqrt(LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getX() * 
+    SmartDashboard.putNumber("Distance from Apriltag",
+    Math.sqrt(LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getX() *
     LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getX() +
-    LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getZ() * 
+    LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getZ() *
     LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getZ())
     );
   }

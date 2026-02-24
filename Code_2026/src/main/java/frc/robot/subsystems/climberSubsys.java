@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class climberSubsys extends SubsystemBase {
-    TalonSRX climberMotor = new TalonSRX(6);
+    TalonSRX climberMotor = new TalonSRX(16);
     private final double kUp = 1;
     private final double kDown = -1;
   /** Creates a new climberSubsys. */

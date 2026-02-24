@@ -60,7 +60,7 @@ public class RobotContainer {
 
   
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(), () -> driverXbox.getLeftY() * -1, () -> driverXbox.getLeftX() * -1)
-  .withControllerRotationAxis(() -> driverXbox.getRightX() * -1.4)
+  .withControllerRotationAxis(() -> driverXbox.getRightX() * -2.5)
   .deadband(OperatorConstants.DEADBAND)
   .scaleTranslation(1.8)
   .allianceRelativeControl(true);
@@ -129,13 +129,30 @@ public class RobotContainer {
     operatorController.rightBumper()
     .onTrue(shooter.getShooterToggleCommand());
 
-    operatorController.a().whileTrue(intake.intakeFuel(25, 16.67));
+    operatorController.a().whileTrue(intake.intakeFuel(22.5, 16.67));
 
     operatorController.x().whileTrue(intake.shootFuel(15,16.67));
 
     operatorController.b().whileTrue(intake.outtakeFuel(25, 16.67));
+
+    driverXbox.rightBumper().whileTrue(new RunCommand(
+      ()-> drivebase.getSwerveDrive().driveFieldOriented(
+        new ChassisSpeeds(0,
+        -1,
+        0)
+      ),drivebase
+    ));
+
+    driverXbox.leftBumper().whileTrue(new RunCommand(
+      ()-> drivebase.getSwerveDrive().driveFieldOriented(
+        new ChassisSpeeds(0,
+        1,
+        0)
+      ),drivebase
+    ));
   
-    driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0));
+    driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, lime, 20, 1.54, 0));
+    // operatorController.x().whileTrue(new VibrateCommand(drivebase));
 
     climber.setDefaultCommand(climber.climb(() -> operatorController.getRightTriggerAxis(), () -> operatorController.getLeftTriggerAxis()));
   }
@@ -159,16 +176,16 @@ public class RobotContainer {
     //     intake.toggle();
     //   });
     // return new intakeState2(intake);
-    return new PathPlannerAuto("auto ian is diddy");
+    // return new PathPlannerAuto("auto ian is diddy");
     
     
-//     Commands.sequence(
-//       shooter.getShooterToggleCommand(),
-//       new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0),
-//       Commands.waitSeconds(.5 ),
-//       Commands.parallel(
-//         new VibrateCommand(drivebase),
-//         intake.shootFuel(25, 16.67))
-//       );
+    return Commands.sequence(
+      shooter.getShooterToggleCommand(),
+      new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0),
+      Commands.waitSeconds(.5 ),
+      Commands.parallel(
+        new VibrateCommand(drivebase),
+        intake.shootFuel(25, 16.67))
+      );
 }
 }

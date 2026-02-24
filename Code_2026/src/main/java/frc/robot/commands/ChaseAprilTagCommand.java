@@ -109,7 +109,7 @@ public class ChaseAprilTagCommand extends Command {
         omega = Math.max(-MAX_OMEGA_RPS, Math.min(MAX_OMEGA_RPS, omega));
         
         // Send to drivetrain
-        swerve.getSwerveDrive().drive(new ChassisSpeeds(-vx, vy,-omega));
+        swerve.getSwerveDrive().drive(new ChassisSpeeds(vx, -vy, -omega));
     
         
   }

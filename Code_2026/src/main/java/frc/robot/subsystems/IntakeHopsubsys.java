@@ -30,8 +30,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeHopsubsys extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
  
-  TalonFX intakeMotor = new TalonFX(2);
-  TalonFX hopperMotor = new TalonFX(1);  
+  TalonFX intakeMotor = new TalonFX(13);
+  TalonFX hopperMotor = new TalonFX(14);  
  
 
 
