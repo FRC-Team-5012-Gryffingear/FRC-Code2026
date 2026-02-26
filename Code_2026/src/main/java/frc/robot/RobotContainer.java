@@ -129,11 +129,11 @@ public class RobotContainer {
     operatorController.rightBumper()
     .onTrue(shooter.getShooterToggleCommand());
 
-    operatorController.a().whileTrue(intake.intakeFuel(22.5, 16.67));
+    operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
 
-    operatorController.x().whileTrue(intake.shootFuel(15,16.67));
+    operatorController.rightTrigger().whileTrue(intake.shootFuel(15,16.67));
 
-    operatorController.b().whileTrue(intake.outtakeFuel(25, 16.67));
+    operatorController.x().whileTrue(intake.intakeFuel(25, 16.67));
 
     driverXbox.rightBumper().whileTrue(new RunCommand(
       ()-> drivebase.getSwerveDrive().driveFieldOriented(
@@ -151,10 +151,10 @@ public class RobotContainer {
       ),drivebase
     ));
   
-    driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, lime, 20, 1.54, 0));
+    driverXbox.b().whileTrue(new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0));
     // operatorController.x().whileTrue(new VibrateCommand(drivebase));
 
-    climber.setDefaultCommand(climber.climb(() -> operatorController.getRightTriggerAxis(), () -> operatorController.getLeftTriggerAxis()));
+    // climber.setDefaultCommand(climber.climb(() -> operatorController.getRightTriggerAxis(), () -> operatorController.getLeftTriggerAxis()));
   }
 
   /**
@@ -176,16 +176,16 @@ public class RobotContainer {
     //     intake.toggle();
     //   });
     // return new intakeState2(intake);
-    // return new PathPlannerAuto("auto ian is diddy");
+    return new PathPlannerAuto("auto ian is diddy");
     
     
-    return Commands.sequence(
-      shooter.getShooterToggleCommand(),
-      new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0),
-      Commands.waitSeconds(.5 ),
-      Commands.parallel(
-        new VibrateCommand(drivebase),
-        intake.shootFuel(25, 16.67))
-      );
+    // return Commands.sequence(
+    //   shooter.getShooterToggleCommand(),
+    //   new ChaseAprilTagCommand(drivebase, lime, 20, 1.8, 0),
+    //   Commands.waitSeconds(.5 ),
+    //   Commands.parallel(
+    //     new VibrateCommand(drivebase),
+    //     intake.shootFuel(25, 16.67))
+    //   );
 }
 }
