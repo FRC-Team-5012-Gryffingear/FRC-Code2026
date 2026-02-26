@@ -23,10 +23,14 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.IntakeHopsubsys;
+import frc.robot.subsystems.ShooterSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private final ShooterSubsystem shooter = new ShooterSubsystem();
+    private final IntakeHopsubsys intake = new IntakeHopsubsys();
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -40,6 +44,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController operatorController = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -49,6 +54,13 @@ public class RobotContainer {
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
+        shooter.setDefaultCommand(shooter.getDefaultCommand());
+        intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
+        operatorController.rightBumper()
+        .onTrue(shooter.getShooterToggleCommand());
+        operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
+        operatorController.rightTrigger().whileTrue(intake.shootFuel(15, 16.67));
+        operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
 
         configureBindings();
 
@@ -86,7 +98,13 @@ public class RobotContainer {
         joystick.povDown().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
-        
+
+        joystick.leftBumper().whileTrue(drivetrain.applyRequest(()->
+            drive.withVelocityY(-0.5)
+        ));
+        joystick.rightBumper().whileTrue(drivetrain.applyRequest(()->
+            drive.withVelocityY(0.5)
+        ));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
