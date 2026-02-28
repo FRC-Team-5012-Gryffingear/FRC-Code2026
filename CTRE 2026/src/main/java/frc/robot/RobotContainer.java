@@ -155,23 +155,37 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-    return new PathPlannerAuto("Test");
-    // return Commands.sequence(
-    //     // 1. Turn on wheels to prepare shooting (point wheels toward hub)
-    //     shooter.getShooterToggleCommand()
-    //     .withTimeout(1.0),  // adjust duration
-    //     // 2. Drive backward 1-2m using PathPlannerAuto (ask Micah/Omar for path name)
-    //     new PathPlannerAuto("ShootPrepBackward"),  // replace with actual path name
-    //     // 3. Correct position using Limelight/ChaseAprilTag at shooting distance
-    //     new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0),  // adjust params as needed
-    //     // 4. Shoot + vibrate in parallel
-    //     Commands.parallel(
-    //         shooter.getShooterToggleCommand(),  // or shooter shooting command
-    //         new VibrateCommand(drivetrain)
-    //     ),
-    //     // 5. Drive to final position (ask Omar, use PathPlanner path)
-    //     new PathPlannerAuto("FinalPosition")  // replace with actual path name
-    // );
+    // return new PathPlannerAuto("Test");
+    return Commands.sequence(
+        // 1. Point wheels (adjust hub angle)
+        drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
+            .withTimeout(1.0),
+        // 2. Backup
+        new PathPlannerAuto("ShootPrepBackward").withTimeout(6.0),
+        // 3. Align
+        new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0).withTimeout(4.0),
+        // 4a. FIRST shot: shooter spin + intake feed
+        Commands.parallel(
+            shooter.getShooterToggleCommand().withTimeout(5.0),  // spin up + shoot 1
+            intake.shootFuel(15, 16.67).withTimeout(1.5)         // feed ball 1
+        ),
+        // 4b. Stop shooting (shooter off, intake off)
+        shooter.getShooterToggleCommand().withTimeout(0.5),    // toggle off
+        intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
+        // 4c. Vibrate confirm shot 1
+        new VibrateCommand(drivetrain).withTimeout(1.0),
+        // 4d. SECOND shot: shooter spin + intake feed
+        Commands.parallel(
+            shooter.getShooterToggleCommand().withTimeout(3.0),  // spin up + shoot 2
+            intake.shootFuel(15, 16.67).withTimeout(1.5)         // feed ball 2
+        ),
+        // 4e. Stop shooting
+        shooter.getShooterToggleCommand().withTimeout(0.5),
+        intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
+        // 5. Final position
+        new PathPlannerAuto("FinalPosition").withTimeout(6.0)
+    );
+
 }
 
 }
