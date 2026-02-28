@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.ChaseAprilTagCommand;
+import frc.robot.commands.VibrateCommand;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climbersubsys;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeHopsubsys;
 import frc.robot.subsystems.LimelightSubsystem;
@@ -33,6 +35,7 @@ public class RobotContainer {
     private final ShooterSubsystem shooter = new ShooterSubsystem();
     private final IntakeHopsubsys intake = new IntakeHopsubsys();
     private final LimelightSubsystem Lime = new LimelightSubsystem();
+    private final Climbersubsys climb = new Climbersubsys();
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -51,6 +54,7 @@ public class RobotContainer {
     .withDeadband(0)
     .withRotationalDeadband(0)
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -67,12 +71,14 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Mode", autoChooser);
         shooter.setDefaultCommand(shooter.getDefaultCommand());
         intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
+        climb.setDefaultCommand(climb.climbStop());
         operatorController.rightBumper()
         .onTrue(shooter.getShooterToggleCommand());
         operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
         operatorController.rightTrigger().whileTrue(intake.shootFuel(15, 16.67));
         operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
-
+        joystick.povUp().whileTrue(climb.climbUp());
+        joystick.povDown().whileTrue(climb.climbDown());
         configureBindings();
 
         // Warmup PathPlanner to avoid Java pauses
@@ -98,25 +104,40 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.y().whileTrue(new VibrateCommand(drivetrain));
+
+        joystick.rightTrigger().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(1).withVelocityY(0))
+        );
+        joystick.leftTrigger().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(-1).withVelocityY(0))
+        );
+       joystick.leftBumper().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(()->
+            strafeLeft.withVelocityY(1).withVelocityX(0).withRotationalRate(0)
         ));
+        joystick.rightBumper().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(()->
+            strafeRight.withVelocityY(-1).withVelocityX(0).withRotationalRate(0)
+        ));
+
+        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        // ));
             // no idea what it does
-        joystick.povUp().whileTrue(drivetrain.applyRequest(() ->
+        joystick.rightTrigger().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
-        joystick.povDown().whileTrue(drivetrain.applyRequest(() ->
+        joystick.leftTrigger().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
         joystick.leftBumper().whileTrue(drivetrain.applyRequest(()->
-            strafeLeft.withVelocityY(-0.5).withVelocityX(0).withRotationalRate(0)
+            strafeLeft.withVelocityY(0.5).withVelocityX(0).withRotationalRate(0)
         ));
         joystick.rightBumper().whileTrue(drivetrain.applyRequest(()->
-            strafeRight.withVelocityY(0.5).withVelocityX(0).withRotationalRate(0)
+            strafeRight.withVelocityY(-0.5).withVelocityX(0).withRotationalRate(0)
         ));
-         joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0));
+         joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -126,9 +147,10 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // Reset the field-centric heading on left bumper press.
-        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
     }
 
     public Command getAutonomousCommand() {

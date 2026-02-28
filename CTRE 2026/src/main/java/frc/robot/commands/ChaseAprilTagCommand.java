@@ -15,6 +15,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
@@ -115,7 +116,10 @@ public class ChaseAprilTagCommand extends Command {
         vx = Math.max(-MAX_VELOCITY_MPS, Math.min(MAX_VELOCITY_MPS, vx));
         vy = Math.max(-MAX_VELOCITY_MPS, Math.min(MAX_VELOCITY_MPS, vy));
         omega = Math.max(-MAX_OMEGA_RPS, Math.min(MAX_OMEGA_RPS, omega));
-        
+
+        SmartDashboard.putNumber("vx", vx);
+        SmartDashboard.putNumber("vy", -vy);
+        SmartDashboard.putNumber("omega", -omega);
         // Send to drivetrain     
         SwerveRequest.RobotCentric chaseReq = new SwerveRequest.RobotCentric()
         .withVelocityX(vx)  // Forward
