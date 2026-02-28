@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -154,7 +155,23 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        /* Run the path selected from the auto chooser */
-        return new PathPlannerAuto("Test");
-    }
+    // return new PathPlannerAuto("Test");
+    return Commands.sequence(
+        // 1. Turn on wheels to prepare shooting (point wheels toward hub)
+        shooter.getShooterToggleCommand()
+        .withTimeout(1.0),  // adjust duration
+        // 2. Drive backward 1-2m using PathPlannerAuto (ask Micah/Omar for path name)
+        new PathPlannerAuto("ShootPrepBackward"),  // replace with actual path name
+        // 3. Correct position using Limelight/ChaseAprilTag at shooting distance
+        new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0),  // adjust params as needed
+        // 4. Shoot + vibrate in parallel
+        Commands.parallel(
+            shooter.getShooterToggleCommand(),  // or shooter shooting command
+            new VibrateCommand(drivetrain)
+        ),
+        // 5. Drive to final position (ask Omar, use PathPlanner path)
+        new PathPlannerAuto("FinalPosition")  // replace with actual path name
+    );
+}
+
 }
