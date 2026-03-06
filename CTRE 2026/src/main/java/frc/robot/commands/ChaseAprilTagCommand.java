@@ -26,6 +26,7 @@ public class ChaseAprilTagCommand extends Command {
   private final int targetTagID;
   private final double forwardOffset;
   private final double horizontalOffset;
+  private final double rotationalOffset;
 
   // ProfiledPIDControllers (separate for each axis like in video)
     private final ProfiledPIDController xController;
@@ -62,12 +63,13 @@ public class ChaseAprilTagCommand extends Command {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ChaseAprilTagCommand(CommandSwerveDrivetrain subsystem, LimelightSubsystem lime, int tagID, double forwardDistance, double horizontalDistance) {
+  public ChaseAprilTagCommand(CommandSwerveDrivetrain subsystem, LimelightSubsystem lime, int tagID, double forwardDistance, double horizontalDistance, double rotationOffset) {
     drivetrain = subsystem;
     limelight = lime;
     targetTagID = tagID;
     forwardOffset = forwardDistance;
     horizontalOffset = horizontalDistance;
+    rotationalOffset = rotationOffset;
 
     TrapezoidProfile.Constraints linearConstraints =
             new TrapezoidProfile.Constraints(MAX_VELOCITY_MPS, MAX_ACCELERATION_MPS2);
@@ -109,7 +111,7 @@ public class ChaseAprilTagCommand extends Command {
         double vx = xController.calculate(limelight.getZ() + forwardOffset,0);
         double vy = yController.calculate(limelight.getX() - horizontalOffset, 0);
         double omega = rotController.calculate(
-            limelight.getYaw(), 0
+            limelight.getYaw() -rotationalOffset, 0
         );
         
         // Clamp to max speeds

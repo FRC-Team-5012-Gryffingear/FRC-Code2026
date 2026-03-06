@@ -14,6 +14,7 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -78,8 +79,7 @@ public class RobotContainer {
         operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
         operatorController.rightTrigger().whileTrue(intake.shootFuel(15, 16.67));
         operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
-        joystick.povUp().whileTrue(climb.climbUp());
-        joystick.povDown().whileTrue(climb.climbDown());
+        
         configureBindings();
 
         // Warmup PathPlanner to avoid Java pauses
@@ -112,7 +112,11 @@ public class RobotContainer {
         );
 
         joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.y().whileTrue(new VibrateCommand(drivetrain));
+        // joystick.y().whileTrue(new VibrateCommand(drivetrain));
+        joystick.y().whileTrue(drivetrain.applyRequest(()-> drive
+        .withVelocityX(LimelightHelpers.getTY("limelight-calvin") * -0.1)
+        .withVelocityY(-joystick.getLeftX()*MaxSpeed)
+        .withRotationalRate(LimelightHelpers.getTX("limelight-calvin") * -0.075)));
 
         joystick.rightTrigger().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(1).withVelocityY(0))
@@ -144,7 +148,9 @@ public class RobotContainer {
         joystick.rightBumper().whileTrue(drivetrain.applyRequest(()->
             strafeRight.withVelocityY(-0.5).withVelocityX(0).withRotationalRate(0)
         ));
-         joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0));
+        //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0, 0)); //ID 10
+        //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, -1.10, Units.degreesToRadians(41.5))); //ID 11
+         joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, 1.10, Units.degreesToRadians(-41.5))); //ID 11
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -172,7 +178,7 @@ public class RobotContainer {
         // 2. Backup
         new PathPlannerAuto("ShootPrepBackward").withTimeout(6.0),
         // 3. Align
-        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0).withTimeout(4.0),
+        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0, 0).withTimeout(4.0),
         // 4a. FIRST shot: shooter spin + intake feed
         
         shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
@@ -221,7 +227,7 @@ public class RobotContainer {
         // 2. Backup
         new PathPlannerAuto("right to shoot").withTimeout(6.0),
         // 3. Align
-        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0).withTimeout(4.0),
+        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0, 0).withTimeout(4.0),
         // 4a. FIRST shot: shooter spin + intake feed
         
         shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
@@ -246,7 +252,7 @@ public class RobotContainer {
         // 2. Backup
         new PathPlannerAuto("ShootPrepBackward").withTimeout(6.0),
         // 3. Align
-        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0).withTimeout(4.0),
+        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0,0).withTimeout(4.0),
         // 4a. FIRST shot: shooter spin + intake feed
         
         shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
@@ -269,7 +275,7 @@ public class RobotContainer {
         // 2. Backup
         new PathPlannerAuto("middle glide").withTimeout(6.0),
         // 3. Align
-        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0).withTimeout(4.0),
+        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0,0).withTimeout(4.0),
         // 4a. FIRST shot: shooter spin + intake feed
         
         shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
