@@ -79,7 +79,8 @@ public class RobotContainer {
         operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
         operatorController.rightTrigger().whileTrue(intake.shootFuel(15, 16.67));
         operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
-        
+        joystick.povUp().whileTrue(climb.climbUp());
+        joystick.povDown().whileTrue(climb.climbDown());
         configureBindings();
 
         // Warmup PathPlanner to avoid Java pauses
@@ -148,9 +149,9 @@ public class RobotContainer {
         joystick.rightBumper().whileTrue(drivetrain.applyRequest(()->
             strafeRight.withVelocityY(-0.5).withVelocityX(0).withRotationalRate(0)
         ));
-        //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0, 0)); //ID 10
+         joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0, 0)); //ID 10
         //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, -1.10, Units.degreesToRadians(41.5))); //ID 11
-         joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, 1.10, Units.degreesToRadians(-41.5))); //ID 11
+        //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, 1.10, Units.degreesToRadians(-41.5))); //ID 11
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
