@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.875,
-        "y": 5.2443333333333335
+        "x": 3.200102564102565,
+        "y": 6.069935897435897
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9754096385542166,
-        "y": 6.6248674698795185
+        "x": 2.6884615384615396,
+        "y": 6.77925641025641
       },
       "isLocked": false,
       "linkedName": "Left Shoot"
     },
     {
       "anchor": {
-        "x": 3.3628974358974375,
-        "y": 7.360666666666666
+        "x": 2.8396282051282067,
+        "y": 7.372294871794873
       },
       "prevControl": {
-        "x": 2.3628974358974375,
-        "y": 7.360666666666666
+        "x": 3.14196153846154,
+        "y": 7.128102564102566
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,10 +45,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "EndingLeft",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -34.71462202505249
+    "rotation": -47.489552921999085
   },
   "useDefaultConstraints": true
 }

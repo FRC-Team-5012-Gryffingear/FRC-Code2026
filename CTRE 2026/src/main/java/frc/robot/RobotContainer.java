@@ -95,6 +95,27 @@ public class RobotContainer {
         // Warmup PathPlanner to avoid Java pauses
         FollowPathCommand.warmupCommand().schedule();
 
+        startToShoot.addOption("Middle to Left", new PathPlannerAuto("StartM to ShootL"));
+        startToShoot.addOption("Middle to Middle", new PathPlannerAuto("StartM to ShootM"));
+        startToShoot.addOption("Middle to Right", new PathPlannerAuto("StartM to ShootR"));
+
+        startToShoot.addOption("Left to Left", new PathPlannerAuto("StartL to ShootL"));
+        startToShoot.addOption("Left to Middle", new PathPlannerAuto("StartL to ShootM"));
+        startToShoot.addOption("Left to Right", new PathPlannerAuto("StartL to ShootR"));
+
+        startToShoot.addOption("Right to Left", new PathPlannerAuto("StartR to ShootL"));
+        startToShoot.addOption("Right to Middle", new PathPlannerAuto("StartR to ShootM"));
+        startToShoot.addOption("Right to Right", new PathPlannerAuto("StartR to ShootR"));
+
+
+        shootToEnd.addOption("Left to Left", new PathPlannerAuto("ShootL to EndL"));
+        shootToEnd.addOption("Left to Right", new PathPlannerAuto("ShootL to EndR"));
+
+        shootToEnd.addOption("Middle to Left", new PathPlannerAuto("ShootM to EndL"));
+        shootToEnd.addOption("Middle to Right", new PathPlannerAuto("ShootM to EndR"));
+
+        shootToEnd.addOption("Right to Left", new PathPlannerAuto("ShootR to EndL"));
+        shootToEnd.addOption("Right to Right", new PathPlannerAuto("ShootR to EndR"));
         // autoChooser.addOption("CenterMoveLeft", getShootLeftAuto());
         // autoChooser.addOption("LeftMoveCenter", getShootRightAuto());
         // autoChooser.addOption("RightMoveCenter", RightToMiddle());
@@ -161,7 +182,7 @@ public class RobotContainer {
         //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0, 0)); //ID 10
         //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, -1.10, Units.degreesToRadians(41.5))); //ID 11
         //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, 1.10, Units.degreesToRadians(-41.5))); //ID 8
-        joystick.b().whileTrue(tagFinder);
+        joystick.b().whileTrue(new TagFinderCommand(drivetrain, Lime));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -184,21 +205,22 @@ public class RobotContainer {
         drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
             .withTimeout(0.2),
         // 2. Backup
-        startToShoot.getSelected(),
+        startToShoot.getSelected().withTimeout(5.0),
         // 3. Align
-        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0, 0).withTimeout(4.0),
+        new TagFinderCommand(drivetrain, Lime),
         // 4a. FIRST shot: shooter spin + intake feed
         
         shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
         Commands.waitSeconds(1.7),
-        intake.shootFuel(20, 18).withTimeout(9.5),
+        intake.shootFuel(20, 18).withTimeout(8.5),
         // 4b. Stop shooting (shooter off, intake off)
         
         // 4e. Stop shooting
         shooter.getShooterToggleCommand().withTimeout(0.5),
         intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
         // 5. Final position
-        shootToEnd.getSelected()
+        shootToEnd.getSelected(),
+        new TagFinderCommand(drivetrain, Lime)
     );
 
     }
