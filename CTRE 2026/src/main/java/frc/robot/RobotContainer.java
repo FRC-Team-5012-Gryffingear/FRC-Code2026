@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix.platform.can.AutocacheState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -15,6 +16,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.ChaseAprilTagCommand;
+import frc.robot.commands.TagFinderCommand;
 import frc.robot.commands.VibrateCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climbersubsys;
@@ -38,6 +41,7 @@ public class RobotContainer {
     private final IntakeHopsubsys intake = new IntakeHopsubsys();
     private final LimelightSubsystem Lime = new LimelightSubsystem();
     private final Climbersubsys climb = new Climbersubsys();
+    
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -65,12 +69,17 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    private final TagFinderCommand tagFinder = new TagFinderCommand(drivetrain, Lime);
+
     /* Path follower */
-    private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> startToShoot;
+    private final SendableChooser<Command> shootToEnd;
 
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("Tests");
-        SmartDashboard.putData("Auto Mode", autoChooser);
+        startToShoot = AutoBuilder.buildAutoChooser("Tests");
+        SmartDashboard.putData("Starting to Shooting", startToShoot);
+        shootToEnd = AutoBuilder.buildAutoChooser("Tests");
+        SmartDashboard.putData("Shooting to Ending", shootToEnd);
         shooter.setDefaultCommand(shooter.getDefaultCommand());
         intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
         climb.setDefaultCommand(climb.climbStop());
@@ -86,11 +95,11 @@ public class RobotContainer {
         // Warmup PathPlanner to avoid Java pauses
         FollowPathCommand.warmupCommand().schedule();
 
-        autoChooser.addOption("CenterMoveLeft", getShootLeftAuto());
-        autoChooser.addOption("LeftMoveCenter", getShootRightAuto());
-        autoChooser.addOption("RightMoveCenter", RightToMiddle());
-        autoChooser.addOption("CenterMoveRight", MiddleToRight());
-        autoChooser.addOption("glide", angledShot());
+        // autoChooser.addOption("CenterMoveLeft", getShootLeftAuto());
+        // autoChooser.addOption("LeftMoveCenter", getShootRightAuto());
+        // autoChooser.addOption("RightMoveCenter", RightToMiddle());
+        // autoChooser.addOption("CenterMoveRight", MiddleToRight());
+        // autoChooser.addOption("glide", angledShot());
     }
 
     private void configureBindings() {
@@ -149,9 +158,10 @@ public class RobotContainer {
         joystick.rightBumper().whileTrue(drivetrain.applyRequest(()->
             strafeRight.withVelocityY(-0.5).withVelocityX(0).withRotationalRate(0)
         ));
-         joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0, 0)); //ID 10
+        //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0, 0)); //ID 10
         //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, -1.10, Units.degreesToRadians(41.5))); //ID 11
-        //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, 1.10, Units.degreesToRadians(-41.5))); //ID 11
+        //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, 1.10, Units.degreesToRadians(-41.5))); //ID 8
+        joystick.b().whileTrue(tagFinder);
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -169,15 +179,12 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
     // return new PathPlannerAuto("Test");
-    return autoChooser.getSelected();
-}
-    public Command getShootLeftAuto(){
         return Commands.sequence(
         // 1. Point wheels (adjust hub angle)
         drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
             .withTimeout(0.2),
         // 2. Backup
-        new PathPlannerAuto("ShootPrepBackward").withTimeout(6.0),
+        startToShoot.getSelected(),
         // 3. Align
         new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0, 0).withTimeout(4.0),
         // 4a. FIRST shot: shooter spin + intake feed
@@ -191,105 +198,9 @@ public class RobotContainer {
         shooter.getShooterToggleCommand().withTimeout(0.5),
         intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
         // 5. Final position
-        new PathPlannerAuto("FinalPosition").withTimeout(6.0)
+        shootToEnd.getSelected()
     );
 
     }
-
-    public Command getShootRightAuto(){
-        return Commands.sequence(
-        // 1. Point wheels (adjust hub angle)
-        drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
-            .withTimeout(0.2),
-        // 2. Backup
-        new PathPlannerAuto("left to shoot").withTimeout(6.0),
-        // 3. Align
-        // new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0).withTimeout(4.0),
-        // 4a. FIRST shot: shooter spin + intake feed
-        
-        shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
-        Commands.waitSeconds(1.7),
-        intake.shootFuel(20, 18).withTimeout(2.5),
-        new VibrateCommand(drivetrain).withTimeout(1),
-        intake.shootFuel(20, 18).withTimeout(2.5),
-        // 4b. Stop shooting (shooter off, intake off)
-        
-        // 4e. Stop shooting
-        shooter.getShooterToggleCommand().withTimeout(0.5),
-        intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
-        // 5. Final position
-        new PathPlannerAuto("shoot to left").withTimeout(6.0)
-    );}
-     public Command RightToMiddle(){
-            return Commands.sequence(
-        // 1. Point wheels (adjust hub angle)
-        drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
-            .withTimeout(0.2),
-        // 2. Backup
-        new PathPlannerAuto("right to shoot").withTimeout(6.0),
-        // 3. Align
-        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0, 0).withTimeout(4.0),
-        // 4a. FIRST shot: shooter spin + intake feed
-        
-        shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
-        Commands.waitSeconds(2),
-        intake.shootFuel(20, 18).withTimeout(2.5),
-        new VibrateCommand(drivetrain).withTimeout(1),
-        intake.shootFuel(20, 18).withTimeout(2.5),
-        // 4b. Stop shooting (shooter off, intake off)
-        
-        // 4e. Stop shooting
-        shooter.getShooterToggleCommand().withTimeout(0.5),
-        intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
-        // 5. Final position
-        new PathPlannerAuto("shoot to right").withTimeout(6.0)
-    ); 
-     }
-     public Command MiddleToRight(){
-            return Commands.sequence(
-        // 1. Point wheels (adjust hub angle)
-        drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
-            .withTimeout(0.2),
-        // 2. Backup
-        new PathPlannerAuto("ShootPrepBackward").withTimeout(6.0),
-        // 3. Align
-        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0,0).withTimeout(4.0),
-        // 4a. FIRST shot: shooter spin + intake feed
-        
-        shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
-        Commands.waitSeconds(1.7),
-        intake.shootFuel(20, 18).withTimeout(5),
-        // 4b. Stop shooting (shooter off, intake off)
-        
-        // 4e. Stop shooting
-        shooter.getShooterToggleCommand().withTimeout(0.5),
-        intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
-        // 5. Final position
-        new PathPlannerAuto("shoot to right").withTimeout(6.0)
-    );
-     }
-     public Command angledShot(){
-            return Commands.sequence(
-        // 1. Point wheels (adjust hub angle)
-        drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
-            .withTimeout(0.2),
-        // 2. Backup
-        new PathPlannerAuto("middle glide").withTimeout(6.0),
-        // 3. Align
-        new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.8, 0,0).withTimeout(4.0),
-        // 4a. FIRST shot: shooter spin + intake feed
-        
-        shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
-        Commands.waitSeconds(1.7),
-        intake.shootFuel(20, 18).withTimeout(5),
-        // 4b. Stop shooting (shooter off, intake off)
-        
-        // 4e. Stop shooting
-        shooter.getShooterToggleCommand().withTimeout(0.5),
-        intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
-        // 5. Final position
-        new PathPlannerAuto("glide to trench entrance").withTimeout(6.0)
-    );
-     }
 
 }

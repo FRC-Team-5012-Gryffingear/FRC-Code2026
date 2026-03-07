@@ -101,7 +101,7 @@ public class ChaseAprilTagCommand extends Command {
   @Override
   public void execute() {
      var visionData = limelight.getRawVisionMeasurement();
-        if ((visionData == null || visionData.tagCount < 1) && LimelightHelpers.getFiducialID("limelight-calvin") == targetTagID) {
+        if ((visionData == null || visionData.tagCount < 1) || !(LimelightHelpers.getFiducialID("limelight-calvin") == targetTagID)) {
             // No tag visible - stop moving
             System.out.println("No tags visible");
             drivetrain.setControl(m_zeroRequest);
