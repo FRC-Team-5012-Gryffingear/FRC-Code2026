@@ -42,13 +42,13 @@ public class ShooterSubsystem extends SubsystemBase {
   // Acceleration when spinning DOWN (slow)
   private static final double SHOOTER_ACCEL_DOWN = 100.0; // rps/s
 
-  private double shooterRPS = 63.6;
+  private double shooterRPS = 63.3;
 
   public ShooterSubsystem() {
     TalonFXConfiguration config = new TalonFXConfiguration();
     Slot0Configs gains = config.Slot0;
-    gains.kP = 0.11; // Tune: output per RPS error
-    gains.kI = 0.01;
+    gains.kP = 0.3; // Tune: output per RPS error, og 0.11
+    gains.kI = 0.03;
     gains.kD = 0.01;
     gains.kV = 0.12; // Key: output per RPS target
     gains.kS = 0.05; // Static friction

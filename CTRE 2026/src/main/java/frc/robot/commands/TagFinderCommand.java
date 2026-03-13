@@ -73,14 +73,103 @@ public class TagFinderCommand extends Command {
                     edu.wpi.first.math.util.Units.degreesToRadians(-41.5)
                 );
                 break;
-            case 7:
+            case 12:
                 chaseCmd = new ChaseAprilTagCommand(
                     drivetrain,
                     limelight,
-                    7,
+                    12,
                     1.24,
                     0,
                     edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
+            case 6:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    8,
+                    1.24,
+                    0,
+                    edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
+            case 1:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    1,
+                    1.24,
+                    0,
+                    edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
+            case 17:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    17,
+                    1.24,
+                    0,
+                    edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
+            case 22:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    22,
+                    1.24,
+                    0,
+                    edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
+            case 26:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    26,
+                    2.0,
+                    0.0,
+                    0.0);
+                break;
+            case 28:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    28,
+                    1.24,
+                    0,
+                    edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
+            case 23:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    23,
+                    1.24,
+                    0,
+                    edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
+            case 24:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    24,
+                    1.24,
+                    1.10,
+                    edu.wpi.first.math.util.Units.degreesToRadians(-41.5)
+                );
+                break;
+            case 27:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    27,
+                    1.24,
+                    -1.10,
+                    edu.wpi.first.math.util.Units.degreesToRadians(41.5)
                 );
                 break;
             default:
