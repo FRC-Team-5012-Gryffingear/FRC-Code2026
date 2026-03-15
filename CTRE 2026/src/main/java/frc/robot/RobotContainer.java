@@ -107,6 +107,9 @@ public class RobotContainer {
         startToShoot.addOption("Right to Middle", new PathPlannerAuto("StartR to ShootM"));
         startToShoot.addOption("Right to Right", new PathPlannerAuto("StartR to ShootR"));
 
+        startToShoot.setDefaultOption("DefaultLeft", new PathPlannerAuto("StartL to ShootL"));
+        
+
 
         shootToEnd.addOption("Left to Left", new PathPlannerAuto("ShootL to EndL"));
         shootToEnd.addOption("Left to Right", new PathPlannerAuto("ShootL to EndR"));
@@ -116,6 +119,7 @@ public class RobotContainer {
 
         shootToEnd.addOption("Right to Left", new PathPlannerAuto("ShootR to EndL"));
         shootToEnd.addOption("Right to Right", new PathPlannerAuto("ShootR to EndR"));
+        shootToEnd.setDefaultOption("DefaultLeftToClimb", new PathPlannerAuto("ShootL to Climb"));
         // autoChooser.addOption("CenterMoveLeft", getShootLeftAuto());
         // autoChooser.addOption("LeftMoveCenter", getShootRightAuto());
         // autoChooser.addOption("RightMoveCenter", RightToMiddle());
@@ -203,7 +207,7 @@ public class RobotContainer {
         return Commands.sequence(
         // 1. Point wheels (adjust hub angle)
         drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
-            .withTimeout(0.2),
+            .withTimeout(0.1),
         // 2. Backup
         startToShoot.getSelected().withTimeout(5.0),
         // 3. Align
@@ -212,7 +216,7 @@ public class RobotContainer {
         
         shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
         Commands.waitSeconds(1.7),
-        intake.shootFuel(20, 18).withTimeout(8.5),
+        intake.shootFuel(20, 18).withTimeout(8),
         // 4b. Stop shooting (shooter off, intake off)
         
         // 4e. Stop shooting
@@ -220,7 +224,8 @@ public class RobotContainer {
         intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
         // 5. Final position
         shootToEnd.getSelected(),
-        new TagFinderCommand(drivetrain, Lime)
+        new TagFinderCommand(drivetrain, Lime).withTimeout(3),
+        climb.climbDown().withTimeout(3.25)
     );
 
     }

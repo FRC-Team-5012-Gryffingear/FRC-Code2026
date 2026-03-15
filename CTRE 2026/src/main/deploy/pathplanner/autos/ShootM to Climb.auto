@@ -9,6 +9,12 @@
           "data": {
             "pathName": "ShootM to Climb"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Climb to Final"
+          }
         }
       ]
     }

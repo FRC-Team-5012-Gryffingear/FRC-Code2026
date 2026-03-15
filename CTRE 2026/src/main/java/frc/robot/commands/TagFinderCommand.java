@@ -172,6 +172,26 @@ public class TagFinderCommand extends Command {
                     edu.wpi.first.math.util.Units.degreesToRadians(41.5)
                 );
                 break;
+            case 16:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    16,
+                    0.7303+0.0508,
+                    0.26,
+                    edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
+            case 32:
+                chaseCmd = new ChaseAprilTagCommand(
+                    drivetrain,
+                    limelight,
+                    32,
+                    0.7303+0.0508,
+                    0.26,
+                    edu.wpi.first.math.util.Units.degreesToRadians(0)
+                );
+                break;
             default:
                 chaseCmd = null;
                 break;
