@@ -69,6 +69,8 @@ public class IntakeHopsubsys extends SubsystemBase {
   
     intakeMMReq.Acceleration = INTAKE_ACCEL_DOWN;
     hopperMMReq.Acceleration = HOPPER_ACCEL_DOWN;
+    intakeMotor.optimizeBusUtilization(1);
+    hopperMotor.optimizeBusUtilization(1);
   }
 
   public void intakeOn(double RPS){

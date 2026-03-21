@@ -16,19 +16,24 @@
     },
     {
       "anchor": {
-        "x": 1.047,
+        "x": 1.0,
         "y": 4.461
       },
       "prevControl": {
-        "x": 0.04699999999999993,
-        "y": 4.461
+        "x": 0.15351282050700743,
+        "y": 5.0350256410198275
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Climb"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.36226166995398185,
+      "rotationDegrees": 180.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -48,7 +53,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -47.489552921999085
+    "rotation": -45.0
   },
   "useDefaultConstraints": true
 }

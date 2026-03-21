@@ -60,7 +60,7 @@ public class TagFinderCommand extends Command {
                     11,
                     1.24,
                     -1.10,
-                    edu.wpi.first.math.util.Units.degreesToRadians(41.5)
+                    edu.wpi.first.math.util.Units.degreesToRadians(45)
                 );
                 break;
             case 8:
@@ -70,7 +70,7 @@ public class TagFinderCommand extends Command {
                     8,
                     1.24,
                     1.10,
-                    edu.wpi.first.math.util.Units.degreesToRadians(-41.5)
+                    edu.wpi.first.math.util.Units.degreesToRadians(-40)
                 );
                 break;
             case 12:
@@ -177,17 +177,17 @@ public class TagFinderCommand extends Command {
                     drivetrain,
                     limelight,
                     16,
-                    0.7303+0.0508,
+                    0.7303+0.0508+0.3,
                     0.26,
                     edu.wpi.first.math.util.Units.degreesToRadians(0)
                 );
                 break;
-            case 32:
+          case 32:
                 chaseCmd = new ChaseAprilTagCommand(
                     drivetrain,
                     limelight,
                     32,
-                    0.7303+0.0508,
+                    0.7303+0.0508+0.3,
                     0.26,
                     edu.wpi.first.math.util.Units.degreesToRadians(0)
                 );

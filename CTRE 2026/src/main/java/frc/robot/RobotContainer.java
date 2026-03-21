@@ -56,6 +56,8 @@ public class RobotContainer {
     .withRotationalDeadband(0)
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
+            private final SwerveRequest.PointWheelsAt pointX = new SwerveRequest.PointWheelsAt();
+
     private final SwerveRequest.RobotCentric strafeRight = new SwerveRequest.RobotCentric()
     .withDeadband(0)
     .withRotationalDeadband(0)
@@ -147,11 +149,13 @@ public class RobotContainer {
         );
 
         joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
+
+   
         // joystick.y().whileTrue(new VibrateCommand(drivetrain));
-        joystick.y().whileTrue(drivetrain.applyRequest(()-> drive
-        .withVelocityX(LimelightHelpers.getTY("limelight-calvin") * -0.1)
-        .withVelocityY(-joystick.getLeftX()*MaxSpeed)
-        .withRotationalRate(LimelightHelpers.getTX("limelight-calvin") * -0.075)));
+        //  * -0.075)))joystick.y().whileTrue(drivetrain.applyRequest(()-> drive
+        // .withVelocityX(LimelightHelpers.getTY("limelight-calvin") * -0.1)
+        // .withVelocityY(-joystick.getLeftX()*MaxSpeed)
+        // .withRotationalRate(LimelightHelpers.getTX("limelight-calvin");
 
         joystick.rightTrigger().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(1).withVelocityY(0))
@@ -166,8 +170,8 @@ public class RobotContainer {
             strafeRight.withVelocityY(-1).withVelocityX(0).withRotationalRate(0)
         ));
 
-        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        // joystick.y().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(0.1,-0.1))
         // ));
             // no idea what it does
         joystick.rightTrigger().whileTrue(drivetrain.applyRequest(() ->
@@ -208,24 +212,25 @@ public class RobotContainer {
         // 1. Point wheels (adjust hub angle)
         drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
             .withTimeout(0.1),
+                    shooter.getShooterToggleCommand().withTimeout(0.2),  // spin up + shoot 1
+
         // 2. Backup
         startToShoot.getSelected().withTimeout(5.0),
         // 3. Align
-        new TagFinderCommand(drivetrain, Lime),
+        new TagFinderCommand(drivetrain, Lime).withTimeout(1.5),
         // 4a. FIRST shot: shooter spin + intake feed
         
-        shooter.getShooterToggleCommand().withTimeout(1.3),  // spin up + shoot 1
-        Commands.waitSeconds(1.7),
-        intake.shootFuel(20, 18).withTimeout(8),
+      
+        intake.shootFuel(20, 18).withTimeout(5),
         // 4b. Stop shooting (shooter off, intake off)
         
         // 4e. Stop shooting
-        shooter.getShooterToggleCommand().withTimeout(0.5),
-        intake.turnOffIntakeHopperSystemCommand().withTimeout(0.5),
+        shooter.getShooterToggleCommand().withTimeout(0.01),
+        intake.turnOffIntakeHopperSystemCommand().withTimeout(0.01),
         // 5. Final position
         shootToEnd.getSelected(),
-        new TagFinderCommand(drivetrain, Lime).withTimeout(3),
-        climb.climbDown().withTimeout(3.25)
+        new TagFinderCommand(drivetrain, Lime).withTimeout(2.3),
+        climb.climbDown().withTimeout(3.75)
     );
 
     }

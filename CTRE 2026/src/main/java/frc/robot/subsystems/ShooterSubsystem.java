@@ -42,12 +42,12 @@ public class ShooterSubsystem extends SubsystemBase {
   // Acceleration when spinning DOWN (slow)
   private static final double SHOOTER_ACCEL_DOWN = 100.0; // rps/s
 
-  private double shooterRPS = 60.25;
+  private double shooterRPS = 58.95;
 
   public ShooterSubsystem() {
     TalonFXConfiguration config = new TalonFXConfiguration();
     Slot0Configs gains = config.Slot0;
-    gains.kP = 0.3; // Tune: output per RPS error, og 0.11
+    gains.kP = 0.4; // Tune: output per RPS error, og 0.11
     gains.kI = 0.03;
     gains.kD = 0.01;
     gains.kV = 0.12; // Key: output per RPS target
@@ -69,6 +69,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     shooterMMReq.Acceleration = SHOOTER_ACCEL_DOWN;
     SmartDashboard.putNumber("RPS Shooter", shooterRPS);
+    shooterMotor.optimizeBusUtilization(1);
   }
   public double getDistanceFromTarget(){
     double distance = Math.sqrt(LimelightHelpers.getCameraPose3d_TargetSpace("limelight-calvin").getX() *
