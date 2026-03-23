@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climbersubsys extends SubsystemBase {
-    TalonSRX climberMotor = new TalonSRX(16);
+    TalonFX climberMotor = new TalonFX(16);
     private final double kUp = 1;
     private final double kDown = -1;
   /** Creates a new Climbersubsys. */
@@ -24,19 +24,20 @@ public class Climbersubsys extends SubsystemBase {
    
   }
   public void climbMove(double power){
-    climberMotor.set(ControlMode.PercentOutput, power);
+    // climberMotor.set(ControlMode.PercentOutput, power);
+    climberMotor.set(power);
   }
 
   public Command climbUp(){
     return run(()->
     {
-        climbMove(0.5);
+        climbMove(0.75);
     });
   }
   public Command climbDown(){
     return run(()->
     {
-        climbMove(-0.5);
+        climbMove(-0.75);
     });
   }
   public Command climbStop(){
