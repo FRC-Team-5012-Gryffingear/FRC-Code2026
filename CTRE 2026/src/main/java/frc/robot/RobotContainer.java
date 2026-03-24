@@ -88,7 +88,7 @@ public class RobotContainer {
         operatorController.rightBumper()
         .onTrue(shooter.getShooterToggleCommand());
         operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
-        operatorController.rightTrigger().whileTrue(intake.shootFuel(15, 16.67));
+        operatorController.rightTrigger().whileTrue(intake.shootFuel(12, 16.67));//shoot orginal hopper 16.67
         operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
         joystick.povUp().whileTrue(climb.climbUp());
         joystick.povDown().whileTrue(climb.climbDown());

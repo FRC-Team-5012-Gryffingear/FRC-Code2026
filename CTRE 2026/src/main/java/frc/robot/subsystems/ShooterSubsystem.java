@@ -42,7 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
   // Acceleration when spinning DOWN (slow)
   private static final double SHOOTER_ACCEL_DOWN = 100.0; // rps/s
 
-  private double shooterRPS = 58.95;
+  private double shooterRPS = 53.95;
 
   public ShooterSubsystem() {
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -148,7 +148,7 @@ public Command getShooterToggleCommand() {
             if (shooterRunning) {
                 shooterOff();
             } else {
-                shooterOn(-shooterRPS);
+                shooterOn(shooterRPS);
           }
         shooterRunning = !shooterRunning;
         },
