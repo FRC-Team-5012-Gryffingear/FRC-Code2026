@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -52,6 +53,19 @@ public class Climbersubsys extends SubsystemBase {
       climbMove(rightTrigger.getAsDouble() - leftTrigger.getAsDouble());
     });
   }
+  public double rotateGetPosition(){
+    return climberMotor.getPosition().getValueAsDouble();
+  }
+  public void resetPosition(){
+    climberMotor.setPosition(0);
+  }
+  public Command zeroPosition(){
+    return run(()-> 
+    {
+      resetPosition();
+    }
+    );
+  }
  
 
   /**
@@ -81,6 +95,7 @@ public class Climbersubsys extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("climbPosition", rotateGetPosition());
   }
 
   @Override
