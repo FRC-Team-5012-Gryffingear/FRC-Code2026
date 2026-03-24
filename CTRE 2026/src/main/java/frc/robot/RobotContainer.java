@@ -85,10 +85,12 @@ public class RobotContainer {
         shooter.setDefaultCommand(shooter.getDefaultCommand());
         intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
         climb.setDefaultCommand(climb.climbStop());
-        operatorController.rightBumper()
-        .onTrue(shooter.getShooterToggleCommand());
+        // operatorController.rightBumper().onTrue(shooter.getShooterToggleCommand(60));
         operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
         operatorController.rightTrigger().whileTrue(intake.shootFuel(12, 16.67));//shoot orginal hopper 16.67
+        operatorController.y().onTrue(shooter.getShooterToggleCommand(60));
+        operatorController.b().onTrue(shooter.getShooterToggleCommand(55));
+        operatorController.a().onTrue(shooter.getShooterToggleCommand(50));
         operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
         joystick.povUp().whileTrue(climb.climbUp());
         joystick.povDown().whileTrue(climb.climbDown());
@@ -212,7 +214,7 @@ public class RobotContainer {
         // 1. Point wheels (adjust hub angle)
         drivetrain.applyRequest(() -> point.withModuleDirection(Rotation2d.fromDegrees(0)))
             .withTimeout(0.1),
-                    shooter.getShooterToggleCommand().withTimeout(0.2),  // spin up + shoot 1
+                    shooter.getShooterToggleCommand(60).withTimeout(0.2),  // spin up + shoot 1
 
         // 2. Backup
         startToShoot.getSelected().withTimeout(5.0),
@@ -225,12 +227,12 @@ public class RobotContainer {
         // 4b. Stop shooting (shooter off, intake off)
         
         // 4e. Stop shooting
-        shooter.getShooterToggleCommand().withTimeout(0.01),
+        shooter.getShooterToggleCommand(60).withTimeout(0.01),
         intake.turnOffIntakeHopperSystemCommand().withTimeout(0.01),
         // 5. Final position
         shootToEnd.getSelected(),
         new TagFinderCommand(drivetrain, Lime).withTimeout(2.3),
-        climb.climbDown().withTimeout(3.75)
+        climb.climbDown().withTimeout(2)
     );
 
     }

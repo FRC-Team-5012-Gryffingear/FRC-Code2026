@@ -48,9 +48,9 @@ public class TagFinderCommand extends Command {
                     drivetrain,
                     limelight,
                     10,
-                    2.0,
-                    0.0,
-                    0.0);
+                    2.0, // 2.0 TZ
+                    0.0  , // 0.0 TX
+                    0.0); //0.0 RY
                 break;
 
             case 11:
@@ -68,9 +68,9 @@ public class TagFinderCommand extends Command {
                     drivetrain,
                     limelight,
                     8,
-                    1.24,
-                    1.10,
-                    edu.wpi.first.math.util.Units.degreesToRadians(-40)
+                    1.64, // TZ
+                    .70, //  TX
+                    edu.wpi.first.math.util.Units.degreesToRadians(-25) // RY
                 );
                 break;
             case 12:

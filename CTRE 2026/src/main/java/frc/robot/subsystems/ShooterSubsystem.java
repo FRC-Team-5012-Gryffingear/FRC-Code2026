@@ -42,7 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
   // Acceleration when spinning DOWN (slow)
   private static final double SHOOTER_ACCEL_DOWN = 100.0; // rps/s
 
-  private double shooterRPS = 53.95;
+  private double shooterRPS = 58.95;
 
   public ShooterSubsystem() {
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -85,6 +85,14 @@ public class ShooterSubsystem extends SubsystemBase {
   public void shooterOn(double RPS){
     shooterMMReq.Acceleration = SHOOTER_ACCEL_UP;
     shooterMotor.setControl(shooterMMReq.withVelocity(RPS));
+    // return run(
+    //   () -> {
+    //     shooterMMReq.Acceleration = SHOOTER_ACCEL_UP;
+    //     shooterMotor.setControl(shooterMMReq.withVelocity(RPS));
+    //   }
+    // ).finallyDo(
+    // ()-> shooterOff()
+    // );
   }
 
 
@@ -142,7 +150,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
 
-public Command getShooterToggleCommand() {
+public Command getShooterToggleCommand(double shooterRPS) {
     return Commands.runOnce(
         () -> {
             if (shooterRunning) {
