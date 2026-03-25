@@ -14,15 +14,18 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climbersubsys extends SubsystemBase {
     TalonFX climberMotor = new TalonFX(16);
-    private final double kUp = 1;
-    private final double kDown = -1;
+    double motorPower = 0.65;
+    private boolean climbUp = false;
+
+
   /** Creates a new Climbersubsys. */
   public Climbersubsys() {
-   
+   resetPosition();
   }
   public void climbMove(double power){
     // climberMotor.set(ControlMode.PercentOutput, power);
@@ -32,13 +35,13 @@ public class Climbersubsys extends SubsystemBase {
   public Command climbUp(){
     return run(()->
     {
-        climbMove(0.75);
+        climbMove(motorPower);
     });
   }
   public Command climbDown(){
     return run(()->
     {
-        climbMove(-0.75);
+        climbMove(-motorPower);
     });
   }
   public Command climbStop(){
@@ -66,7 +69,39 @@ public class Climbersubsys extends SubsystemBase {
     }
     );
   }
- 
+  public Command goDownto(double position){
+    return run(()-> {
+      double error = position - rotateGetPosition();
+      double kP = 0.01;
+      double power = kP * error;
+      power = Math.max(-0.75, Math.min(0.7, power));
+      climbMove(power);
+    });
+  }
+
+  public Command startToClimb(double targetRotations){
+    return Commands.startEnd(this::climbUp, this::climbStop, this)
+    .until(() -> rotateGetPosition() >= targetRotations);
+  }
+
+  public Command climbToStart(double targetRotations){
+    return Commands.startEnd(this::climbDown, this::climbStop, this)
+    .until(() -> rotateGetPosition() <= targetRotations);
+  }
+
+  public Command getShooterToggleCommand(double shooterRPS) {
+    return Commands.runOnce(
+        () -> {
+            if (climbUp) {
+                climbToStart(0);
+            } else {
+                startToClimb(10);
+          }
+        climbUp = !climbUp;
+        },
+      this
+    );
+}
 
   /**
    * Example command factory method.
