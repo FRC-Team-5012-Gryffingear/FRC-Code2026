@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RPM;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -48,7 +49,7 @@ public class ShooterSubsystem extends SubsystemBase {
     TalonFXConfiguration config = new TalonFXConfiguration();
     Slot0Configs gains = config.Slot0;
     gains.kP = 0.4; // Tune: output per RPS error, og 0.11
-    gains.kI = 0.03;
+    gains.kI = 0.0; //OG 0.03
     gains.kD = 0.01;
     gains.kV = 0.12; // Key: output per RPS target
     gains.kS = 0.05; // Static friction
@@ -60,12 +61,15 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
+    CurrentLimitsConfigs limitsConfigs = new CurrentLimitsConfigs();
+    limitsConfigs.SupplyCurrentLimit = 80; //tune 
+    limitsConfigs.SupplyCurrentLowerLimit = 40;
 
 
 
 
     shooterMotor.getConfigurator().apply(config);
+    shooterMotor.getConfigurator().apply(limitsConfigs);
 
     shooterMMReq.Acceleration = SHOOTER_ACCEL_DOWN;
     SmartDashboard.putNumber("RPS Shooter", shooterRPS);

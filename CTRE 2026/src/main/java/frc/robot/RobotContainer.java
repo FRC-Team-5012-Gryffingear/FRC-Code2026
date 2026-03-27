@@ -87,7 +87,7 @@ public class RobotContainer {
         climb.setDefaultCommand(climb.climbStop());
         // operatorController.rightBumper().onTrue(shooter.getShooterToggleCommand(60));
         operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
-        operatorController.rightTrigger().whileTrue(intake.shootFuel(12, 16.67));//shoot orginal hopper 16.67
+        operatorController.rightTrigger().whileTrue(intake.shootFuel(13, 18));//shoot orginal hopper 16.67
         operatorController.y().onTrue(shooter.getShooterToggleCommand(60));
         operatorController.b().onTrue(shooter.getShooterToggleCommand(55));
         operatorController.a().onTrue(shooter.getShooterToggleCommand(75));
@@ -204,7 +204,7 @@ public class RobotContainer {
         // Reset the field-centric heading on left bumper press.
         joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         joystick.povLeft().whileTrue(climb.zeroPosition());
-        joystick.povRight().onTrue(climb.goDownto(-4.6));
+        joystick.povRight().onTrue(climb.goDownto(-5.7));
         drivetrain.registerTelemetry(logger::telemeterize);
 
     
@@ -213,23 +213,23 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
     // return new PathPlannerAuto("Test");
         return Commands.sequence(
+        climb.zeroPosition().withTimeout(0.3),
         shooter.getShooterToggleCommand(60).withTimeout(0.2),  // spin up + shoot 1
-
         // 2. Backup
         startToShoot.getSelected().withTimeout(5.0),
         // 3. Align
         new TagFinderCommand(drivetrain, Lime).withTimeout(1.5),
-        Commands.parallel(intake.shootFuel(20, 18).withTimeout(5), climb.startToClimb(10)),
+        intake.shootFuel(20, 18).withTimeout(5),
         // 4a. FIRST shot: shooter spin + intake feed
         // 4b. Stop shooting (shooter off, intake off)
         
         // 4e. Stop shooting
-        shooter.getShooterToggleCommand(60).withTimeout(0.01),
+        shooter.getShooterToggleCommand(55).withTimeout(0.01),
         intake.turnOffIntakeHopperSystemCommand().withTimeout(0.01),
         // 5. Final position
         shootToEnd.getSelected(),
         new TagFinderCommand(drivetrain, Lime).withTimeout(2.3),
-        climb.climbToStart(0)
+        climb.goDownto(-5.7)
     );
 
     }

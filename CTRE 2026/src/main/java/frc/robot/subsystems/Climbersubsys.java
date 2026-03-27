@@ -72,9 +72,9 @@ public class Climbersubsys extends SubsystemBase {
   public Command goDownto(double position){
     return run(()-> {
       double error = position - rotateGetPosition();
-      double kP = 0.01;
+      double kP = 0.1;
       double power = kP * error;
-      power = Math.max(-0.75, Math.min(0.7, power));
+      power = Math.max(-0.75, Math.min(0.75, power));
       climbMove(power);
     });
   }
