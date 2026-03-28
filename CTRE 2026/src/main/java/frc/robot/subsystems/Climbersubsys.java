@@ -89,7 +89,7 @@ public class Climbersubsys extends SubsystemBase {
     .until(() -> rotateGetPosition() <= targetRotations);
   }
 
-  public Command getShooterToggleCommand(double shooterRPS) {
+  public Command getCimberToggleCommand(double shooterRPS) {
     return Commands.runOnce(
         () -> {
             if (climbUp) {

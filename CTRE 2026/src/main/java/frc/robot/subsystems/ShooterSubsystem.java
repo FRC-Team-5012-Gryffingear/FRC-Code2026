@@ -56,7 +56,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     var motionMagic = config.MotionMagic;
     motionMagic.MotionMagicCruiseVelocity = 0; // Not used for velocity
-  motionMagic.MotionMagicAcceleration = 4000; // OK as fallback
+    motionMagic.MotionMagicAcceleration = 4000; // OK as fallback
 
 
 

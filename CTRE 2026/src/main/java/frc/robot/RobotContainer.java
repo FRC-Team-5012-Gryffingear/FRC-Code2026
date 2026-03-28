@@ -88,7 +88,7 @@ public class RobotContainer {
         // operatorController.rightBumper().onTrue(shooter.getShooterToggleCommand(60));
         operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
         operatorController.rightTrigger().whileTrue(intake.shootFuel(13, 18));//shoot orginal hopper 16.67
-        operatorController.y().onTrue(shooter.getShooterToggleCommand(60));
+        operatorController.y().onTrue(shooter.getShooterToggleCommand(58));
         operatorController.b().onTrue(shooter.getShooterToggleCommand(55));
         operatorController.a().onTrue(shooter.getShooterToggleCommand(75));
         operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
@@ -219,12 +219,12 @@ public class RobotContainer {
         startToShoot.getSelected().withTimeout(5.0),
         // 3. Align
         new TagFinderCommand(drivetrain, Lime).withTimeout(1.5),
-        intake.shootFuel(20, 18).withTimeout(5),
+        intake.shootFuel(20, 13).withTimeout(5),
         // 4a. FIRST shot: shooter spin + intake feed
         // 4b. Stop shooting (shooter off, intake off)
         
         // 4e. Stop shooting
-        shooter.getShooterToggleCommand(55).withTimeout(0.01),
+        shooter.getShooterToggleCommand(50).withTimeout(0.01),
         intake.turnOffIntakeHopperSystemCommand().withTimeout(0.01),
         // 5. Final position
         shootToEnd.getSelected(),
