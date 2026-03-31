@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RPM;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -56,7 +58,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     var motionMagic = config.MotionMagic;
     motionMagic.MotionMagicCruiseVelocity = 0; // Not used for velocity
-    motionMagic.MotionMagicAcceleration = 4000; // OK as fallback
+   motionMagic.MotionMagicAcceleration = 4000; // OK as fallback
 
 
 
@@ -84,22 +86,10 @@ public class ShooterSubsystem extends SubsystemBase {
     return distance;
   }
 
-
-
   public void shooterOn(double RPS){
     shooterMMReq.Acceleration = SHOOTER_ACCEL_UP;
     shooterMotor.setControl(shooterMMReq.withVelocity(RPS));
-    // return run(
-    //   () -> {
-    //     shooterMMReq.Acceleration = SHOOTER_ACCEL_UP;
-    //     shooterMotor.setControl(shooterMMReq.withVelocity(RPS));
-    //   }
-    // ).finallyDo(
-    // ()-> shooterOff()
-    // );
   }
-
-
 
 
 
@@ -108,12 +98,6 @@ public class ShooterSubsystem extends SubsystemBase {
     shooterOff();
 
   }
-
-
-
-
-
-
 
 
 
@@ -135,22 +119,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
 
-
-
-
   public Command turnOffShooterCommand(){
     return run(()->{
       shooterOff();
     });
   }
-
-
-
-
-
-
-
-
 
 
 
@@ -178,11 +151,6 @@ public Command shooterRunCommand() {
 
 
 }
-
-
-
-
-
 
 
 

@@ -7,25 +7,43 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class agitatorsubsys extends SubsystemBase {
-    TalonSRX agitatorMotor = new TalonSRX(70); //change to acctual ID when added
-    double agitateSpeed = 0.50; //tune to liking
+    TalonSRX agitatorMotor = new TalonSRX(17); //change to acctual ID when added
+    double agitateSpeed;
+    // private boolean agitatorRunning = false;
+
 
   /** Creates a new Climbersubsys. */
   public agitatorsubsys() {
-
+    
     }
     public void agitatorMove(double power){
         agitatorMotor.set(ControlMode.PercentOutput, power);
     }
-    public Command agitate(){
-        return run(()->
-        {
-            agitatorMove(agitateSpeed);
+    public Command agitate(double agitatePower){
+        return run (()->{
+            agitatorMove(-agitatePower);
         });
     }
+//     public void agitate(double agitateSpeed){
+//         agitatorMove(agitateSpeed);
+//     }
+//     public Command getAgitateMove(double agitateSpeed) {
+//         return Commands.runOnce(
+//         () -> {
+//             if (agitatorRunning) {
+//                 agitate(0);
+//             } else {
+//                 agitate(10);
+//           }
+//         agitatorRunning = !agitatorRunning;
+//         },
+//       this
+//     );
+// }
   /**
    * Example command factory method.
    *
