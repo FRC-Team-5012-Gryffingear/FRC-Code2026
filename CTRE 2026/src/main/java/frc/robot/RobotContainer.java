@@ -38,7 +38,7 @@ import frc.robot.subsystems.agitatorsubsys;
 
     public class RobotContainer {
         private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+        private double MaxAngularRate = RotationsPerSecond.of(0.9).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
         private final ShooterSubsystem shooter = new ShooterSubsystem();
         private final IntakeHopsubsys intake = new IntakeHopsubsys();
         private final LimelightSubsystem Lime = new LimelightSubsystem();
@@ -89,12 +89,13 @@ import frc.robot.subsystems.agitatorsubsys;
             shooter.setDefaultCommand(shooter.getDefaultCommand());
             intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
             climb.setDefaultCommand(climb.climbStop());
+            agitator.setDefaultCommand(agitator.agitate(0));
             // operatorController.rightBumper().onTrue(shooter.getShooterToggleCommand(60));
             operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
-            operatorController.rightTrigger().whileTrue(intake.shootFuel(13, 18));//shoot orginal hopper 16.67
+            operatorController.rightTrigger().whileTrue(intake.shootFuel(12, 18));//shoot orginal hopper 16.67
             operatorController.leftBumper().onTrue(shooter.getShooterToggleCommand(80)); // shoot
             operatorController.rightBumper().whileTrue(agitator.agitate(0.70)); //agitator 1.0 = 100% power
-            operatorController.y().onTrue(shooter.getShooterToggleCommand(60));
+            operatorController.y().onTrue(shooter.getShooterToggleCommand(59));
             operatorController.b().onTrue(shooter.getShooterToggleCommand(55));
             operatorController.a().onTrue(shooter.getShooterToggleCommand(65));
             operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
