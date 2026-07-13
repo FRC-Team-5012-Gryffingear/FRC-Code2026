@@ -11,10 +11,12 @@ import frc.robot.LimelightHelpers;
 
 public class LimelightSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  private static final String LL_NAME = "limelight-calvin";
+  private final String LL_NAME;
 
 
-  public LimelightSubsystem() {}
+  public LimelightSubsystem(String Limelight_Name) {
+    LL_NAME = Limelight_Name;
+  }
 
   public double getX(){
     return LimelightHelpers.getCameraPose3d_TargetSpace(LL_NAME).getX();
@@ -25,6 +27,10 @@ public class LimelightSubsystem extends SubsystemBase {
 
   public double getDistance(){
     return Math.sqrt(getX() * getX() + getZ() * getZ());
+  }
+
+  public double getID(){
+    return LimelightHelpers.getFiducialID(LL_NAME);
   }
 
   public double getYaw(){

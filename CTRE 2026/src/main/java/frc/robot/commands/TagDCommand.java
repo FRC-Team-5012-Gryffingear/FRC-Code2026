@@ -16,7 +16,6 @@ public class TagDCommand extends Command {
     private final CommandSwerveDrivetrain drivetrain;
     private final LimelightSubsystem limelight;
     private Command activeCommand;
-    private static final String Limelight_name = "limelight-daniel";
        @SuppressWarnings("PMD.UnusedPrivateField")
 /**
    * Creates a new TagFinderCommand.
@@ -39,7 +38,7 @@ public class TagDCommand extends Command {
             return;
         }
 
-        int seenID = (int) LimelightHelpers.getFiducialID(Limelight_name);
+        int seenID = (int) limelight.getID();
 
         Command chaseCmd;
         switch (seenID) {

@@ -41,7 +41,7 @@ import frc.robot.subsystems.agitatorsubsys;
         private double MaxAngularRate = RotationsPerSecond.of(0.9).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
         private final ShooterSubsystem shooter = new ShooterSubsystem();
         private final IntakeHopsubsys intake = new IntakeHopsubsys();
-        private final LimelightSubsystem Lime = new LimelightSubsystem();
+        private final LimelightSubsystem Lime = new LimelightSubsystem("limelight-calvin");
         private final Climbersubsys climb = new Climbersubsys();
         private final agitatorsubsys agitator = new agitatorsubsys();
         
@@ -95,10 +95,11 @@ import frc.robot.subsystems.agitatorsubsys;
             operatorController.rightTrigger().whileTrue(intake.shootFuel(12, 18));//shoot orginal hopper 16.67
             operatorController.leftBumper().onTrue(shooter.getShooterToggleCommand(80)); // shoot
             operatorController.rightBumper().whileTrue(agitator.agitate(0.70)); //agitator 1.0 = 100% power
-            operatorController.y().onTrue(shooter.getShooterToggleCommand(59));
+            operatorController.y().onTrue(shooter.getShooterToggleCommand(61));
             operatorController.b().onTrue(shooter.getShooterToggleCommand(55));
-            operatorController.a().onTrue(shooter.getShooterToggleCommand(65));
+            operatorController.a().onTrue(shooter.getShooterToggleCommand(63));
             operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
+            operatorController.povUp().onTrue(shooter.getShooterToggleCommand(64));
 
             joystick.povUp().whileTrue(climb.climbUp());
             joystick.povDown().whileTrue(climb.climbDown());
@@ -223,7 +224,7 @@ import frc.robot.subsystems.agitatorsubsys;
         // return new PathPlannerAuto("Test");
             return Commands.sequence(
             climb.zeroPosition().withTimeout(0.1),
-            shooter.getShooterToggleCommand(58).withTimeout(0.2),  // spin up + shoot 1
+            shooter.getShooterToggleCommand(58.75).withTimeout(0.2),  // spin up + shoot 1
             // 2. Backup
             startToShoot.getSelected().withTimeout(5.0),
             // 3. Align
