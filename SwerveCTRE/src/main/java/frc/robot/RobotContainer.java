@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +28,10 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+    private final SwerveRequest.RobotCentric Cdrive = new SwerveRequest.RobotCentric()
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+        .withDeadband(0)
+        .withRotationalDeadband(0);
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -52,6 +57,8 @@ public class RobotContainer {
             )
         );
 
+
+        
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
@@ -59,7 +66,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.y().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
@@ -71,9 +78,12 @@ public class RobotContainer {
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // Reset the field-centric heading on left bumper press.
-        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
+        // Reset the field-centric heading on a button press.
+        joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        joystick.povLeft().whileTrue(drivetrain.applyRequest(()-> Cdrive.withVelocityY(-0.5).withVelocityX(0).withRotationalRate(0)));
+        joystick.povUp().whileTrue(drivetrain.applyRequest(()-> Cdrive.withVelocityX(-0.5).withVelocityY(0).withRotationalRate(0)));
+        joystick.povRight().whileTrue(drivetrain.applyRequest(()-> Cdrive.withVelocityY(0.5).withVelocityX(0).withRotationalRate(0)));
+        joystick.povDown().whileTrue(drivetrain.applyRequest(()-> Cdrive.withVelocityX(0.5).withVelocityY(0).withRotationalRate(0)));
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
