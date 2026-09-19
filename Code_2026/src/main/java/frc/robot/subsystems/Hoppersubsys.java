@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,16 +12,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hoppersubsys extends SubsystemBase {
   /** Creates a new Hoppersubsys. */
-  private final TalonSRX MotorR = new TalonSRX(6);
-  private final TalonSRX MotorL = new TalonSRX(7);
+  private final TalonSRX MotorL = new TalonSRX(1);
+  private final TalonSRX MotorR = new TalonSRX(2);
 
   public Hoppersubsys() {}
 
   public void moverightmotor(double power){
-    MotorR.set(ControlMode.PercentOutput, -power);    
+    MotorR.set(ControlMode.PercentOutput, power);    
   }
+
   public void moveleftmotor(double power){
     MotorL.set(ControlMode.PercentOutput, power);    
+  }
+
+  public void moveHopper(double power){
+    MotorR.set(ControlMode.PercentOutput, power);
+    MotorL.set(ControlMode.PercentOutput, power);  
   }
 
   public Command moveRCommand(double Rpower){
@@ -34,6 +39,12 @@ public class Hoppersubsys extends SubsystemBase {
     return run(()->{
         moveleftmotor(Lpower);
     });
+  }
+
+  public Command moveHCommand(double Hpower){
+   return run(()->{
+    moveHopper(Hpower);
+   });
   }
   /**
    * Example command factory method.
