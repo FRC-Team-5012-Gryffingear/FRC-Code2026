@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -15,37 +18,54 @@ public class Hoppersubsys extends SubsystemBase {
   private final TalonSRX MotorL = new TalonSRX(1);
   private final TalonSRX MotorR = new TalonSRX(2);
 
-  public Hoppersubsys() {}
-
-  public void moverightmotor(double power){
-    MotorR.set(ControlMode.PercentOutput, power);    
+  public Hoppersubsys() {
   }
 
-  public void moveleftmotor(double power){
+// functions 
+  public void moverightmotor(double power){//moves right motor
+    MotorR.set(ControlMode.PercentOutput, power);   
+  }
+
+  public void stopRMotor(){ //stops right motor by setting power to 0% 
+    MotorR.set(ControlMode.PercentOutput,0);
+  }
+
+  public void moveleftmotor(double power){//moves left motor
     MotorL.set(ControlMode.PercentOutput, power);    
   }
 
-  public void moveHopper(double power){
-    MotorR.set(ControlMode.PercentOutput, power);
+  public void stopLMotor(){//stops Left motor by setting power to 0%
+    MotorL.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void moveHopper(double power){ //makes the Hopper move (moves two motors)
+    MotorR.set(ControlMode.PercentOutput, -power);
     MotorL.set(ControlMode.PercentOutput, power);  
   }
 
+  public void stopHopper(){// stops the Hopper by seting L & R motors power to 0%
+    MotorR.set(ControlMode.PercentOutput, 0);
+    MotorL.set(ControlMode.PercentOutput, 0);
+  }
+//commands
   public Command moveRCommand(double Rpower){
-    return run(()->{
-        moverightmotor(Rpower);
-    });
+    return this.startEnd(
+      ()-> moverightmotor(Rpower),
+      ()-> stopRMotor());
   } 
+
   public Command moveLCommmand(double Lpower){
-    return run(()->{
-        moveleftmotor(Lpower);
-    });
+    return this.startEnd(
+      ()-> moveleftmotor(Lpower),
+      ()-> stopLMotor());
   }
 
   public Command moveHCommand(double Hpower){
-   return run(()->{
-    moveHopper(Hpower);
-   });
+   return this.startEnd(
+    ()-> moveHopper(Hpower),
+    ()-> stopHopper());
   }
+
   /**
    * Example command factory method.
    *

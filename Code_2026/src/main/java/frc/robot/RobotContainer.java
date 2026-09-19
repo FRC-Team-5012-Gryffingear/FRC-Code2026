@@ -33,11 +33,15 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
 
-    m_driverController.rightBumper().whileTrue(Hopper.moveRCommand(2)); // 1 = 100% power
-    m_driverController.leftBumper().whileTrue(Hopper.moveLCommmand(2)); 
+    m_driverController.povUp().toggleOnTrue(Hopper.moveRCommand(-0.1)); //1 = 100%
+    m_driverController.povRight().toggleOnTrue(Hopper.moveRCommand(0.1));
 
-    m_driverController.povUp().whileTrue(Hopper.moveHCommand(2));
-    m_driverController.povDown().whileTrue(Hopper.moveHCommand(-2));
+    m_driverController.povLeft().toggleOnTrue(Hopper.moveLCommmand(0.1)); 
+    m_driverController.povDown().toggleOnTrue(Hopper.moveLCommmand(-0.1));
+    
+    m_driverController.rightBumper().toggleOnTrue(Hopper.moveHCommand(0.5));
+    m_driverController.leftBumper().toggleOnTrue(Hopper.moveHCommand(-0.5));
+
   }
 
   /**
