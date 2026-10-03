@@ -34,7 +34,7 @@ import frc.robot.commands.TagFinderCommand;
     import frc.robot.subsystems.IntakeHopsubsys;
     import frc.robot.subsystems.LimelightSubsystem;
     import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.agitatorsubsys;
+// import frc.robot.subsystems.agitatorsubsys;
 
     public class RobotContainer {
         private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -42,8 +42,8 @@ import frc.robot.subsystems.agitatorsubsys;
         private final ShooterSubsystem shooter = new ShooterSubsystem();
         private final IntakeHopsubsys intake = new IntakeHopsubsys();
         private final LimelightSubsystem Lime = new LimelightSubsystem("limelight-calvin");
-        private final Climbersubsys climb = new Climbersubsys();
-        private final agitatorsubsys agitator = new agitatorsubsys();
+        // private final Climbersubsys climb = new Climbersubsys();
+        // private final agitatorsubsys agitator = new agitatorsubsys();
         
 
         /* Setting up bindings for necessary control of the swerve drive platform */
@@ -74,8 +74,8 @@ import frc.robot.subsystems.agitatorsubsys;
 
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-        private final TagFinderCommand tagFinder = new TagFinderCommand(drivetrain, Lime);
-        private final TagDCommand tagD = new TagDCommand(drivetrain, Lime);
+        // private final TagFinderCommand tagFinder = new TagFinderCommand(drivetrain, Lime);
+        // private final TagDCommand tagD = new TagDCommand(drivetrain, Lime);
 
         /* Path follower */
         private final SendableChooser<Command> startToShoot;
@@ -88,21 +88,21 @@ import frc.robot.subsystems.agitatorsubsys;
             SmartDashboard.putData("Shooting to Ending", shootToEnd);
             shooter.setDefaultCommand(shooter.getDefaultCommand());
             intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
-            climb.setDefaultCommand(climb.climbStop());
-            agitator.setDefaultCommand(agitator.agitate(0));
+            // climb.setDefaultCommand(climb.climbStop());
+            // agitator.setDefaultCommand(agitator.agitate(0));
             // operatorController.rightBumper().onTrue(shooter.getShooterToggleCommand(60));
-            operatorController.leftTrigger().whileTrue(intake.outtakeFuel(22.5, 16.67)); //intake
-            operatorController.rightTrigger().whileTrue(intake.shootFuel(12, 18));//shoot orginal hopper 16.67
+            operatorController.leftTrigger().whileTrue(intake.intakeFuel(25, 16.67)); //intake
+            operatorController.rightTrigger().whileTrue(intake.shootFuel(18, 10));//shoot orginal hopper 16.67
             operatorController.leftBumper().onTrue(shooter.getShooterToggleCommand(80)); // shoot
-            operatorController.rightBumper().whileTrue(agitator.agitate(0.70)); //agitator 1.0 = 100% power
+            // operatorController.rightBumper().whileTrue(agitator.agitate(0.70)); //agitator 1.0 = 100% power
             operatorController.y().onTrue(shooter.getShooterToggleCommand(61));
             operatorController.b().onTrue(shooter.getShooterToggleCommand(55));
             operatorController.a().onTrue(shooter.getShooterToggleCommand(63));
-            operatorController.x().whileTrue(intake.intakeFuel(25, 16.67)); //outtake
+            operatorController.x().whileTrue(intake.outtakeFuel(22.5, 16.67)); //outtake
             operatorController.povUp().onTrue(shooter.getShooterToggleCommand(64));
 
-            joystick.povUp().whileTrue(climb.climbUp());
-            joystick.povDown().whileTrue(climb.climbDown());
+            // joystick.povUp().whileTrue(climb.climbUp());
+            // joystick.povDown().whileTrue(climb.climbDown());
             configureBindings();
 
             // Warmup PathPlanner to avoid Java pauses
@@ -201,8 +201,8 @@ import frc.robot.subsystems.agitatorsubsys;
             //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0, 0)); //ID 10
             //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, -1.10, Units.degreesToRadians(41.5))); //ID 11
             //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, 1.10, Units.degreesToRadians(-41.5))); //ID 8
-            joystick.b().whileTrue(new TagFinderCommand(drivetrain, Lime));
-            joystick.y().whileTrue(new TagDCommand(drivetrain, Lime));
+            // joystick.b().whileTrue(new TagFinderCommand(drivetrain, Lime));
+            // joystick.y().whileTrue(new TagDCommand(drivetrain, Lime));
 
             // Run SysId routines when holding back/start and X/Y.
             // Note that each routine should be run exactly once in a single log.
@@ -213,8 +213,8 @@ import frc.robot.subsystems.agitatorsubsys;
 
             // Reset the field-centric heading on left bumper press.
             joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-            joystick.povLeft().whileTrue(climb.zeroPosition());
-            joystick.povRight().onTrue(climb.goDownto(-5.7));
+            // joystick.povLeft().whileTrue(climb.zeroPosition());
+            // joystick.povRight().onTrue(climb.goDownto(-5.7));
             drivetrain.registerTelemetry(logger::telemeterize);
 
         
@@ -223,12 +223,12 @@ import frc.robot.subsystems.agitatorsubsys;
         public Command getAutonomousCommand() {
         // return new PathPlannerAuto("Test");
             return Commands.sequence(
-            climb.zeroPosition().withTimeout(0.1),
+            // climb.zeroPosition().withTimeout(0.1),
             shooter.getShooterToggleCommand(58.75).withTimeout(0.2),  // spin up + shoot 1
             // 2. Backup
             startToShoot.getSelected().withTimeout(5.0),
             // 3. Align
-            new TagFinderCommand(drivetrain, Lime).withTimeout(1.5),
+            // new TagFinderCommand(drivetrain, Lime).withTimeout(1.5),
             intake.shootFuel(20, 13).withTimeout(5),
             // 4a. FIRST shot: shooter spin + intake feed
             // 4b. Stop shooting (shooter off, intake off)
@@ -237,9 +237,9 @@ import frc.robot.subsystems.agitatorsubsys;
             shooter.getShooterToggleCommand(50).withTimeout(0.01),
             intake.turnOffIntakeHopperSystemCommand().withTimeout(0.01),
             // 5. Final position
-            shootToEnd.getSelected(),
-            new TagFinderCommand(drivetrain, Lime).withTimeout(2.3),
-            climb.goDownto(-5.7)
+            shootToEnd.getSelected()
+            // new TagFinderCommand(drivetrain, Lime).withTimeout(2.3)
+            // climb.goDownto(-5.7)
         );
 
         }
