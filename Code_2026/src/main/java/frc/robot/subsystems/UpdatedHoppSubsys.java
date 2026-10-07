@@ -110,31 +110,6 @@ public class UpdatedHoppSubsys extends SubsystemBase {
             hopperMoveMaxMin(power);
         }).finallyDo(interrupted -> hoppermove(0));
     }
-//   public Command hopperExtend(){
-//     return run(()->{
-//         hoppermove(hopperPower);
-//     });
-//   }
-
-//   public Command hopperRetract(){
-//     return run(()->{
-//         hoppermove(-hopperPower);
-//     });
-//   }
-
-//   public void hopperMoveMaxMin(double power){
-//     if ((rotateGetLeftPosition() > 5 || rotateGetRightPosition() > 5) && power > 0){
-//         power = 0;
-//     }
-//     hoppermove(power);
-//   }
-
-  
-//   public Command extendHopper(DoubleSupplier rightTrigger, DoubleSupplier leftTrigger){
-//     return run(()->{
-//         hopperMoveMaxMin(rightTrigger.getAsDouble() - leftTrigger.getAsDouble());
-//     });
-//   } 
 
   /**
    * Example command factory method.

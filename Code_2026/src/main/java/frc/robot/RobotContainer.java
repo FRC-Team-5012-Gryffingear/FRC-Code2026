@@ -10,6 +10,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.counter.UpDownCounter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -18,6 +20,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.IntakeHopsubsys;
+import frc.robot.subsystems.ShooterSubsys;
+import frc.robot.subsystems.UpdatedHoppSubsys;
+import frc.robot.subsystems.agitatorsubsys;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -30,13 +36,35 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
+    private final ShooterSubsys shooter = new ShooterSubsys();
+    private final IntakeHopsubsys intake = new IntakeHopsubsys();
+    private final UpdatedHoppSubsys hopper = new UpdatedHoppSubsys();
+    private final agitatorsubsys agitator = new agitatorsubsys();
+    
+
+
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController operater = new CommandXboxController(1);
+
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
+        shooter.setDefaultCommand(shooter.getDefaultCommand());
+        intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
+
+        //Operator commands
+        operater.leftTrigger().whileTrue(intake.intakeFuel(25, 16.67)); //intake
+        operater.rightTrigger().whileTrue(intake.shootFuel(18, 10));//shoot orginal hopper 16.67
+        operater.leftBumper().onTrue(shooter.getShooterToggleCommand(80)); // shoot
+
+        operater.y().onTrue(shooter.getShooterToggleCommand(61));
+        operater.b().onTrue(shooter.getShooterToggleCommand(55));
+        operater.a().onTrue(shooter.getShooterToggleCommand(63));
+        operater.x().whileTrue(intake.outtakeFuel(22.5, 16.67)); //outtake
+        operater.povUp().onTrue(shooter.getShooterToggleCommand(64));
         configureBindings();
     }
 
@@ -59,10 +87,10 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
+        joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        // ));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -72,15 +100,19 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // Reset the field-centric heading on left bumper press.
-        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
+        //hopper
+        joystick.rightTrigger().whileTrue(hopper.hopperExtend());
+        joystick.leftBumper().whileTrue(hopper.hopperRetract());
+        
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
     public Command getAutonomousCommand() {
         // Simple drive forward auton
         final var idle = new SwerveRequest.Idle();
-        return Commands.sequence(
+        return Commands.sequence( 
             // Reset our field centric heading to match the robot
             // facing away from our alliance station wall (0 deg).
             drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
