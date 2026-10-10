@@ -7,16 +7,12 @@
     import static edu.wpi.first.units.Units.*;
 
     import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-    import com.ctre.phoenix.platform.can.AutocacheState;
     import com.ctre.phoenix6.swerve.SwerveRequest;
 
     import com.pathplanner.lib.auto.AutoBuilder;
     import com.pathplanner.lib.commands.FollowPathCommand;
     import com.pathplanner.lib.commands.PathPlannerAuto;
 
-    import edu.wpi.first.math.geometry.Rotation2d;
-    import edu.wpi.first.math.util.Units;
-    import edu.wpi.first.wpilibj.DriverStation;
     import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
     import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
     import edu.wpi.first.wpilibj2.command.Command;
@@ -24,24 +20,19 @@
     import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
     import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
     import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-    import frc.robot.commands.ChaseAprilTagCommand;
-import frc.robot.commands.TagDCommand;
-import frc.robot.commands.TagFinderCommand;
-    import frc.robot.commands.VibrateCommand;
     import frc.robot.generated.TunerConstants;
-    import frc.robot.subsystems.Climbersubsys;
     import frc.robot.subsystems.CommandSwerveDrivetrain;
     import frc.robot.subsystems.IntakeHopsubsys;
-    import frc.robot.subsystems.LimelightSubsystem;
     import frc.robot.subsystems.ShooterSubsystem;
 // import frc.robot.subsystems.agitatorsubsys;
+import frc.robot.subsystems.UpdatedHoppSubsys;
 
     public class RobotContainer {
         private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
         private double MaxAngularRate = RotationsPerSecond.of(0.9).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
         private final ShooterSubsystem shooter = new ShooterSubsystem();
         private final IntakeHopsubsys intake = new IntakeHopsubsys();
-        private final LimelightSubsystem Lime = new LimelightSubsystem("limelight-calvin");
+        private final UpdatedHoppSubsys hopper = new UpdatedHoppSubsys();
         // private final Climbersubsys climb = new Climbersubsys();
         // private final agitatorsubsys agitator = new agitatorsubsys();
         
@@ -52,19 +43,8 @@ import frc.robot.commands.TagFinderCommand;
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
         private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-        private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
-                .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-        private final SwerveRequest.RobotCentric strafeLeft = new SwerveRequest.RobotCentric()
-        .withDeadband(0)
-        .withRotationalDeadband(0)
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
                 private final SwerveRequest.PointWheelsAt pointX = new SwerveRequest.PointWheelsAt();
-
-        private final SwerveRequest.RobotCentric strafeRight = new SwerveRequest.RobotCentric()
-        .withDeadband(0)
-        .withRotationalDeadband(0)
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
         
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -168,36 +148,21 @@ import frc.robot.commands.TagFinderCommand;
             // .withVelocityY(-joystick.getLeftX()*MaxSpeed)
             // .withRotationalRate(LimelightHelpers.getTX("limelight-calvin");
 
-            joystick.rightTrigger().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(() ->
-                forwardStraight.withVelocityX(1).withVelocityY(0))
-            );
-            joystick.leftTrigger().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(() ->
-                forwardStraight.withVelocityX(-1).withVelocityY(0))
-            );
-            joystick.leftBumper().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(()->
-                strafeLeft.withVelocityY(1).withVelocityX(0).withRotationalRate(0)
-            ));
-            joystick.rightBumper().and(joystick.povLeft()).whileTrue(drivetrain.applyRequest(()->
-                strafeRight.withVelocityY(-1).withVelocityX(0).withRotationalRate(0)
-            ));
+            joystick.povUp().whileTrue(hopper.hopperExtend());
+            joystick.povDown().whileTrue(hopper.hopperRetract());
+
+            joystick.rightTrigger().whileTrue(hopper.leftExtend());
+            joystick.rightBumper().whileTrue(hopper.leftRetract());
+
+            joystick.leftTrigger().whileTrue(hopper.rightExtend());
+            joystick.leftBumper().whileTrue(hopper.rightRetract());
+
 
             // joystick.y().whileTrue(drivetrain.applyRequest(() ->
             //     point.withModuleDirection(new Rotation2d(0.1,-0.1))
             // ));
                 // no idea what it does
-            joystick.rightTrigger().whileTrue(drivetrain.applyRequest(() ->
-                forwardStraight.withVelocityX(0.5).withVelocityY(0))
-            );
-            joystick.leftTrigger().whileTrue(drivetrain.applyRequest(() ->
-                forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-            );
-
-            joystick.leftBumper().whileTrue(drivetrain.applyRequest(()->
-                strafeLeft.withVelocityY(0.5).withVelocityX(0).withRotationalRate(0)
-            ));
-            joystick.rightBumper().whileTrue(drivetrain.applyRequest(()->
-                strafeRight.withVelocityY(-0.5).withVelocityX(0).withRotationalRate(0)
-            ));
+ 
             //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 2.0, 0, 0)); //ID 10
             //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, -1.10, Units.degreesToRadians(41.5))); //ID 11
             //  joystick.b().whileTrue(new ChaseAprilTagCommand(drivetrain, Lime, 20, 1.24, 1.10, Units.degreesToRadians(-41.5))); //ID 8
