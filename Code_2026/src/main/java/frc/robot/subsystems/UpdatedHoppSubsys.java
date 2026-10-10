@@ -10,16 +10,19 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class UpdatedHoppSubsys extends SubsystemBase {
   /** Creates a new UpdatedHoppSubsys. */
-  private final TalonFX leftHopM = new TalonFX(16); // change to proper ID when added
-  private final TalonFX rightHopM = new TalonFX(18);//ditto ^
+  private final TalonFX leftHopM = new TalonFX(18); // change to proper ID when added
+  private final TalonFX rightHopM = new TalonFX(16);//ditto ^
 
-  double hopperPower = 0.1;
+  // double hopperPower = 0.06;
+  double rightPower = 0.08;
+  double leftPower = 0.06;
 
   public UpdatedHoppSubsys() {
     TalonFXConfiguration rightConfig = new TalonFXConfiguration();
@@ -60,56 +63,48 @@ public class UpdatedHoppSubsys extends SubsystemBase {
     );
   }
 
-  public Command zeroPositions(){
-    return Commands.sequence(zeroLeftPosition(), zeroRightPosition());
-  }
-
-  public void hoppermove(double powerm){
-    rightHopM.set(powerm);
-    leftHopM.set(powerm);
-  }
-
-  public void hopperMoveMaxMin(double power) {
-        double leftPosition = rotateGetLeftPosition();
-        double rightPosition = rotateGetRightPosition();
-
-        // Stop extension if either side reaches the upper limit.
-        if (power > 0 &&
-            (leftPosition >= 5.0 || rightPosition >= 5.0)) {
-            power = 0;
-        }
-
-        // Stop retraction if either side reaches the lower limit.
-        if (power < 0 &&
-            (leftPosition <= 0.0 || rightPosition <= 0.0)) {
-            power = 0;
-        }
-
-        hoppermove(power);
+    public Command zeroPositions(){
+      return Commands.sequence(zeroLeftPosition(), zeroRightPosition());
     }
 
+    public void hoppermove(double powerRight, double powerLeft){
+      rightHopM.set(powerRight);
+      leftHopM.set(powerLeft);
+    }
+    public void rightMove(double powerR){
+      rightHopM.set(powerR);
+    }
+    public void leftMove(double powerL){
+      leftHopM.set(powerL);
+    }
+
+    public Command rightExtend(){
+        return run(()-> rightMove(rightPower))
+            .finallyDo(interrupted -> rightMove(0));
+    }
+    public Command leftExtend(){
+      return run(()->leftMove(leftPower))
+            .finallyDo(interrupted -> leftMove(0));
+    }
     public Command hopperExtend() {
-        return run(() -> hopperMoveMaxMin(hopperPower))
-            .finallyDo(interrupted -> hoppermove(0));
+        return run(() -> hoppermove(rightPower, leftPower))
+            .finallyDo(interrupted -> hoppermove(0, 0));
     }
-
+    
+    
+    public Command rightRetract(){
+      return run(()-> rightMove(-rightPower))
+            .finallyDo(interrupted -> rightMove(0));
+    }
+    public Command leftRetract(){
+      return run(()-> leftMove(-leftPower))
+            .finallyDo(interrupted -> leftMove(0));
+    }
     public Command hopperRetract() {
-        return run(() -> hopperMoveMaxMin(-hopperPower))
-            .finallyDo(interrupted -> hoppermove(0));
+        return run(() -> hoppermove(-rightPower, -leftPower))
+            .finallyDo(interrupted -> hoppermove(0,0));
     }
 
-    public Command extendHopper(
-        DoubleSupplier rightTrigger,
-        DoubleSupplier leftTrigger
-    ) {
-        return run(() -> {
-            double power =
-                (rightTrigger.getAsDouble() -
-                leftTrigger.getAsDouble()) * hopperPower;
-
-            hopperMoveMaxMin(power);
-        }).finallyDo(interrupted -> hoppermove(0));
-    }
 
   /**
    * Example command factory method.
@@ -138,6 +133,10 @@ public class UpdatedHoppSubsys extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Left Pos", rotateGetLeftPosition());
+    SmartDashboard.putNumber("Right Pose", rotateGetRightPosition());
+    SmartDashboard.putNumber("left Motor Speed", leftHopM.getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Right Motor Speed", rightHopM.getVelocity().getValueAsDouble());
   }
 
   @Override

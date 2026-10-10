@@ -60,16 +60,18 @@ public class TunerConstants {
             new CurrentLimitsConfigs()
                 // Default supply current limit is 70 A, but it can be lowered to avoid brownouts.
                 // Supply current limits can be larger than the breaker current rating.
-                .withSupplyCurrentLimit(Amps.of(70))
-                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Amps.of(55)) //change as needed
+                .withSupplyCurrentLowerLimit(Amps.of(30))//change as neededd
         );
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
         .withCurrentLimits(
             new CurrentLimitsConfigs()
                 // Swerve azimuth does not require much torque output, so we can set a relatively low
                 // stator current limit to help avoid brownouts without impacting performance.
-                .withStatorCurrentLimit(Amps.of(60))
+                .withStatorCurrentLimit(Amps.of(60))//change as needed
                 .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Amps.of(50))
+                .withSupplyCurrentLowerLimit(Amps.of(30))
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
