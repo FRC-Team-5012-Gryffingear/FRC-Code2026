@@ -103,7 +103,7 @@ public class ChaseAprilTagCommand extends Command {
      var visionData = limelight.getRawVisionMeasurement();
         if ((visionData == null || visionData.tagCount < 1) || !(limelight.getID() == targetTagID)) {
             // No tag visible - stop moving
-            System.out.println("No tags visible");
+            // System.out.println("No tags visible");
             drivetrain.setControl(m_zeroRequest);
             return;
         }
@@ -148,8 +148,8 @@ public class ChaseAprilTagCommand extends Command {
         
         boolean timedOut = elapsed > TIMEOUT_SECONDS;
         
-        if (atGoal) System.out.println("✅ Reached goal!");
-        if (timedOut) System.out.println("⏱️ Timeout!");
+        // if (atGoal) System.out.println("✅ Reached goal!");
+        // if (timedOut) System.out.println("⏱️ Timeout!");
         
         return atGoal || timedOut;
   }

@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootM to Climb"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Climb to Final"
+            "pathName": "TestPathA"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Climb",
+  "folder": null,
   "choreoAuto": false
 }

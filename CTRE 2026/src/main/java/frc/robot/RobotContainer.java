@@ -24,8 +24,8 @@
     import frc.robot.subsystems.CommandSwerveDrivetrain;
     import frc.robot.subsystems.IntakeHopsubsys;
     import frc.robot.subsystems.ShooterSubsystem;
-// import frc.robot.subsystems.agitatorsubsys;
-import frc.robot.subsystems.UpdatedHoppSubsys;
+    import frc.robot.subsystems.agitatorsubsys;
+    import frc.robot.subsystems.UpdatedHoppSubsys;
 
     public class RobotContainer {
         private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -34,7 +34,7 @@ import frc.robot.subsystems.UpdatedHoppSubsys;
         private final IntakeHopsubsys intake = new IntakeHopsubsys();
         private final UpdatedHoppSubsys hopper = new UpdatedHoppSubsys();
         // private final Climbersubsys climb = new Climbersubsys();
-        // private final agitatorsubsys agitator = new agitatorsubsys();
+        private final agitatorsubsys agitator = new agitatorsubsys();
         
 
         /* Setting up bindings for necessary control of the swerve drive platform */
@@ -69,12 +69,12 @@ import frc.robot.subsystems.UpdatedHoppSubsys;
             shooter.setDefaultCommand(shooter.getDefaultCommand());
             intake.setDefaultCommand(intake.turnOffIntakeHopperSystemCommand());
             // climb.setDefaultCommand(climb.climbStop());
-            // agitator.setDefaultCommand(agitator.agitate(0));
+            agitator.setDefaultCommand(agitator.agitate(0));
             // operatorController.rightBumper().onTrue(shooter.getShooterToggleCommand(60));
-            operatorController.leftTrigger().whileTrue(intake.intakeFuel(25, 16.67)); //intake
-            operatorController.rightTrigger().whileTrue(intake.shootFuel(18, 10));//shoot orginal hopper 16.67
+            operatorController.leftTrigger().whileTrue(intake.intakeFuel(25, 16.67)); //intake og 16.67
+            operatorController.rightTrigger().whileTrue(intake.shootFuel(18, 16.67));//shoot orginal hopper 16.67
             operatorController.leftBumper().onTrue(shooter.getShooterToggleCommand(80)); // shoot
-            // operatorController.rightBumper().whileTrue(agitator.agitate(0.70)); //agitator 1.0 = 100% power
+            operatorController.rightBumper().whileTrue(agitator.agitate(0.70)); //agitator 1.0 = 100% power
             operatorController.y().onTrue(shooter.getShooterToggleCommand(61));
             operatorController.b().onTrue(shooter.getShooterToggleCommand(55));
             operatorController.a().onTrue(shooter.getShooterToggleCommand(63));
@@ -88,6 +88,7 @@ import frc.robot.subsystems.UpdatedHoppSubsys;
             // Warmup PathPlanner to avoid Java pauses
             FollowPathCommand.warmupCommand().schedule();
 
+            startToShoot.addOption("TestAutoPathA", new PathPlannerAuto("TestAutoA"));
             startToShoot.addOption("Middle to Left", new PathPlannerAuto("StartM to ShootL"));
             startToShoot.addOption("Middle to Middle", new PathPlannerAuto("StartM to ShootM"));
             startToShoot.addOption("Middle to Right", new PathPlannerAuto("StartM to ShootR"));
@@ -103,7 +104,7 @@ import frc.robot.subsystems.UpdatedHoppSubsys;
             startToShoot.setDefaultOption("DefaultLeft", new PathPlannerAuto("StartL to ShootL"));
             
 
-
+            shootToEnd.addOption("TestAutoPathB", new PathPlannerAuto("TestAutoB"));
             shootToEnd.addOption("Left to Left", new PathPlannerAuto("ShootL to EndL"));
             shootToEnd.addOption("Left to Right", new PathPlannerAuto("ShootL to EndR"));
 
@@ -147,15 +148,15 @@ import frc.robot.subsystems.UpdatedHoppSubsys;
             // .withVelocityX(LimelightHelpers.getTY("limelight-calvin") * -0.1)
             // .withVelocityY(-joystick.getLeftX()*MaxSpeed)
             // .withRotationalRate(LimelightHelpers.getTX("limelight-calvin");
+            
+            joystick.povRight().whileTrue(hopper.rightExtend());
+            joystick.povUp().whileTrue(hopper.rightRetract());
 
-            joystick.povUp().whileTrue(hopper.hopperExtend());
-            joystick.povDown().whileTrue(hopper.hopperRetract());
+            joystick.povLeft().whileTrue(hopper.leftExtend());
+            joystick.povDown().whileTrue(hopper.leftRetract());
 
-            joystick.rightTrigger().whileTrue(hopper.leftExtend());
-            joystick.rightBumper().whileTrue(hopper.leftRetract());
-
-            joystick.leftTrigger().whileTrue(hopper.rightExtend());
-            joystick.leftBumper().whileTrue(hopper.rightRetract());
+            joystick.rightTrigger().whileTrue(hopper.hopperExtend());
+            joystick.leftTrigger().whileTrue(hopper.hopperRetract());
 
 
             // joystick.y().whileTrue(drivetrain.applyRequest(() ->
@@ -188,8 +189,9 @@ import frc.robot.subsystems.UpdatedHoppSubsys;
         public Command getAutonomousCommand() {
         // return new PathPlannerAuto("Test");
             return Commands.sequence(
-            // climb.zeroPosition().withTimeout(0.1),
-            shooter.getShooterToggleCommand(58.75).withTimeout(0.2),  // spin up + shoot 1
+            // startToShoot.getSelected().withTimeout(5.0),
+            // shootToEnd.getSelected()
+            shooter.getShooterToggleCommand(55.00).withTimeout(0.2),  // spin up + shoot 1 //58,75
             // 2. Backup
             startToShoot.getSelected().withTimeout(5.0),
             // 3. Align

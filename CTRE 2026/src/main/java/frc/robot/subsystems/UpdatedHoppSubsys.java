@@ -21,8 +21,11 @@ public class UpdatedHoppSubsys extends SubsystemBase {
   private final TalonFX rightHopM = new TalonFX(16);//ditto ^
 
   // double hopperPower = 0.06;
-  double rightPower = 0.08;
-  double leftPower = 0.06;
+  double rightPowerE = 0.08; //OG 0.08
+  double leftPowerE = 0.06; //OG 0.06
+
+  double rightPowerR = 0.1; //OG 0.1
+  double leftPowerR = 0.08; //OG 0.08
 
   public UpdatedHoppSubsys() {
     TalonFXConfiguration rightConfig = new TalonFXConfiguration();
@@ -79,29 +82,29 @@ public class UpdatedHoppSubsys extends SubsystemBase {
     }
 
     public Command rightExtend(){
-        return run(()-> rightMove(rightPower))
+        return run(()-> rightMove(rightPowerE))
             .finallyDo(interrupted -> rightMove(0));
     }
     public Command leftExtend(){
-      return run(()->leftMove(leftPower))
+      return run(()->leftMove(leftPowerE))
             .finallyDo(interrupted -> leftMove(0));
     }
     public Command hopperExtend() {
-        return run(() -> hoppermove(rightPower, leftPower))
+        return run(() -> hoppermove(rightPowerE, leftPowerE))
             .finallyDo(interrupted -> hoppermove(0, 0));
     }
     
     
     public Command rightRetract(){
-      return run(()-> rightMove(-rightPower))
+      return run(()-> rightMove(-rightPowerR))
             .finallyDo(interrupted -> rightMove(0));
     }
     public Command leftRetract(){
-      return run(()-> leftMove(-leftPower))
+      return run(()-> leftMove(-leftPowerR))
             .finallyDo(interrupted -> leftMove(0));
     }
     public Command hopperRetract() {
-        return run(() -> hoppermove(-rightPower, -leftPower))
+        return run(() -> hoppermove(-rightPowerR, -leftPowerR))
             .finallyDo(interrupted -> hoppermove(0,0));
     }
 
