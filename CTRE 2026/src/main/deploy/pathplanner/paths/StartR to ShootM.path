@@ -23,9 +23,25 @@
         "x": 2.1067710843373493,
         "y": 2.0898674698795183
       },
-      "nextControl": null,
+      "nextControl": {
+        "x": 1.8932289156626507,
+        "y": 5.910132530120482
+      },
       "isLocked": false,
       "linkedName": "Middle Shoot"
+    },
+    {
+      "anchor": {
+        "x": 1.8163461538461552,
+        "y": 3.5815
+      },
+      "prevControl": {
+        "x": 1.854787534754403,
+        "y": 4.745816265060241
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
