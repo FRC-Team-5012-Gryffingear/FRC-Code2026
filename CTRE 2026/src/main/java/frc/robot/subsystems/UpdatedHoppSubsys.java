@@ -22,10 +22,10 @@ public class UpdatedHoppSubsys extends SubsystemBase {
 
   // double hopperPower = 0.06;
   double rightPowerE = 0.08; //OG 0.08
-  double leftPowerE = 0.06; //OG 0.06
+  double leftPowerE = 0.03; //OG 0.06
 
   double rightPowerR = 0.1; //OG 0.1
-  double leftPowerR = 0.08; //OG 0.08
+  double leftPowerR = 0.03; //OG 0.08
 
   public UpdatedHoppSubsys() {
     TalonFXConfiguration rightConfig = new TalonFXConfiguration();

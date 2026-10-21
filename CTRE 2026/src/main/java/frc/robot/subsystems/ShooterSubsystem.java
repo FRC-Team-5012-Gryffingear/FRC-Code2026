@@ -37,6 +37,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private final MotionMagicVelocityVoltage shooterMMReq = new MotionMagicVelocityVoltage(0);
 
+  double flapPower = 0.03;
+  double flappowerR = 0.08;
 
 
   // Acceleration when spinning UP (fast)
@@ -90,6 +92,21 @@ public class ShooterSubsystem extends SubsystemBase {
     shooterMMReq.Acceleration = SHOOTER_ACCEL_UP;
     shooterMotor.setControl(shooterMMReq.withVelocity(RPS));
   }
+
+  public void flapmove(double power){
+      shooterMotor.set(power);
+    }
+  public Command flapExtend(){
+        return run(()-> flapmove(flapPower))
+        .withTimeout(3)
+            .finallyDo(interrupted -> flapmove(0));
+    }
+ public Command flapContract(){
+        return run(()-> flapmove(-flappowerR))
+        .withTimeout(3)
+            .finallyDo(interrupted -> flapmove(0));
+    }
+
 
 
 

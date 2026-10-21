@@ -100,6 +100,7 @@
             startToShoot.addOption("Right to Left", new PathPlannerAuto("StartR to ShootL"));
             startToShoot.addOption("Right to Middle", new PathPlannerAuto("StartR to ShootM"));
             startToShoot.addOption("Right to Right", new PathPlannerAuto("StartR to ShootR"));
+            startToShoot.addOption("Trench to middle", new PathPlannerAuto("block city"));
 
             startToShoot.setDefaultOption("DefaultLeft", new PathPlannerAuto("StartL to ShootL"));
             
@@ -113,7 +114,6 @@
 
             shootToEnd.addOption("Right to Left", new PathPlannerAuto("ShootR to EndL"));
             shootToEnd.addOption("Right to Right", new PathPlannerAuto("ShootR to EndR"));
-            shootToEnd.setDefaultOption("DefaultLeftToClimb", new PathPlannerAuto("ShootL to Climb"));
             // autoChooser.addOption("CenterMoveLeft", getShootLeftAuto());
             // autoChooser.addOption("LeftMoveCenter", getShootRightAuto());
             // autoChooser.addOption("RightMoveCenter", RightToMiddle());
@@ -155,8 +155,9 @@
             joystick.povLeft().whileTrue(hopper.leftExtend());
             joystick.povDown().whileTrue(hopper.leftRetract());
 
-            joystick.rightTrigger().whileTrue(hopper.hopperExtend());
-            joystick.leftTrigger().whileTrue(hopper.hopperRetract());
+            joystick.rightTrigger().onTrue(shooter.flapExtend());
+            joystick.leftTrigger().onTrue(shooter.flapContract());
+
 
 
             // joystick.y().whileTrue(drivetrain.applyRequest(() ->
@@ -191,18 +192,18 @@
             return Commands.sequence(
             // startToShoot.getSelected().withTimeout(5.0),
             // shootToEnd.getSelected()
-            shooter.getShooterToggleCommand(55.00).withTimeout(0.2),  // spin up + shoot 1 //58,75
+            // shooter.getShooterToggleCommand(55.00).withTimeout(0.2),  // spin up + shoot 1 //58,75
             // 2. Backup
             startToShoot.getSelected().withTimeout(5.0),
             // 3. Align
             // new TagFinderCommand(drivetrain, Lime).withTimeout(1.5),
-            intake.shootFuel(20, 13).withTimeout(5),
+            // intake.shootFuel(20, 13).withTimeout(5),
             // 4a. FIRST shot: shooter spin + intake feed
             // 4b. Stop shooting (shooter off, intake off)
             
             // 4e. Stop shooting
-            shooter.getShooterToggleCommand(50).withTimeout(0.01),
-            intake.turnOffIntakeHopperSystemCommand().withTimeout(0.01),
+            // shooter.getShooterToggleCommand(50).withTimeout(0.01),
+            // intake.turnOffIntakeHopperSystemCommand().withTimeout(0.01),
             // 5. Final position
             shootToEnd.getSelected()
             // new TagFinderCommand(drivetrain, Lime).withTimeout(2.3)
